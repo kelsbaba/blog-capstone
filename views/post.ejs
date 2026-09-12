@@ -1,0 +1,47 @@
+<%- include("partials/header") %>
+
+<article class="single-post">
+
+    <h1>
+        <%= post.title %>
+    </h1>
+
+    <p class="post-meta">
+        By <%= post.author %> | <%= post.date %>
+    </p>
+
+    <div class="post-content">
+
+        <p>
+            <%= post.content %>
+        </p>
+
+    </div>
+
+    <div class="post-actions">
+
+        <a href="/edit/<%= post.id %>" class="btn">
+            Edit Post
+        </a>
+
+        <form
+            action="/delete/<%= post.id %>"
+            method="POST"
+            style="display:inline;"
+        >
+
+            <button
+                type="submit"
+                class="btn delete-btn"
+                onclick="return confirm('Delete this post?')"
+            >
+                Delete Post
+            </button>
+
+        </form>
+
+    </div>
+
+</article>
+
+<%- include("partials/footer") %>

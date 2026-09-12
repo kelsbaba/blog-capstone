@@ -1,0 +1,53 @@
+<%- include("partials/header") %>
+
+<section class="form-section">
+
+    <h1>Create a New Blog Post ✍️</h1>
+
+    <form action="/create" method="POST">
+
+        <label for="title">
+            Post Title
+        </label>
+
+        <input
+            type="text"
+            id="title"
+            name="title"
+            placeholder="Enter your post title"
+            required
+        >
+
+        <label for="author">
+            Author Name
+        </label>
+
+        <input
+            type="text"
+            id="author"
+            name="author"
+            placeholder="Enter your name"
+            required
+        >
+
+        <label for="content">
+            Post Content
+        </label>
+
+        <textarea
+            id="content"
+            name="content"
+            rows="10"
+            placeholder="Write your blog post..."
+            required
+        ></textarea>
+
+        <button type="submit" class="btn">
+            Publish Post
+        </button>
+
+    </form>
+
+</section>
+
+<%- include("partials/footer") %>
