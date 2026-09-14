@@ -45,7 +45,7 @@ and delete blog posts.
 
 blog-capstone/
 
-├── server.js
+├── index.js
 ├── database.js
 ├── package.json
 ├── package-lock.json
@@ -77,7 +77,7 @@ cd blog-capstone
 3. Install dependencies
 npm install
 4. Start the server
-node server.js
+node index.js
 5. Open the application
 
 Visit:
@@ -100,6 +100,7 @@ Open a blog post.
 Click "Edit Post".
 Update the information.
 Click "Update Post".
+
 Delete a Post
 Open a blog post.
 Click "Delete Post".

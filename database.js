@@ -14,6 +14,35 @@ db.exec(`
     )
 `);
 
+// Create users table
+db.exec(`
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT NOT NULL UNIQUE,
+        email TEXT NOT NULL UNIQUE,
+        password_hash TEXT NOT NULL,
+        created_at TEXT NOT NULL
+    )
+`);
+
+// Add user_id column to existing posts table
+const postColumns = db.prepare(`
+    PRAGMA table_info(posts)
+`).all();
+
+const hasUserIdColumn = postColumns.some(
+    column => column.name === "user_id"
+);
+
+if (!hasUserIdColumn) {
+    db.exec(`
+        ALTER TABLE posts
+        ADD COLUMN user_id INTEGER
+    `);
+}
+
+
+
 console.log("Database connected successfully");
 
 // Export database

@@ -18,17 +18,15 @@
             required
         >
 
-        <label for="author">
-            Author Name
-        </label>
+        <label for="author">Author:</label>
 
-        <input
-            type="text"
-            id="author"
-            name="author"
-            placeholder="Enter your name"
-            required
-        >
+<input
+    type="text"
+    id="author"
+    name="author"
+    value="<%= currentUser.username %>"
+    readonly
+>
 
         <label for="content">
             Post Content
