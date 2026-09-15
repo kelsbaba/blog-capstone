@@ -14,22 +14,24 @@ db.exec(`
     )
 `);
 
-// Create users table
-db.exec(`
-    CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT NOT NULL UNIQUE,
-        email TEXT NOT NULL UNIQUE,
-        password_hash TEXT NOT NULL,
-        created_at TEXT NOT NULL
-    )
-`);
-
-// Add user_id column to existing posts table
+// Check existing posts table columns
 const postColumns = db.prepare(`
     PRAGMA table_info(posts)
 `).all();
 
+// Add category_id column if it does not exist
+const hasCategoryId = postColumns.some(
+    column => column.name === "category_id"
+);
+
+if (!hasCategoryId) {
+    db.exec(`
+        ALTER TABLE posts
+        ADD COLUMN category_id INTEGER
+    `);
+}
+
+// Add user_id column if it does not exist
 const hasUserIdColumn = postColumns.some(
     column => column.name === "user_id"
 );
@@ -41,6 +43,16 @@ if (!hasUserIdColumn) {
     `);
 }
 
+// Create users table
+db.exec(`
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT NOT NULL UNIQUE,
+        email TEXT NOT NULL UNIQUE,
+        password_hash TEXT NOT NULL,
+        created_at TEXT NOT NULL
+    )
+`);
 
 // Create comments table
 db.exec(`
@@ -54,6 +66,32 @@ db.exec(`
     )
 `);
 
+// Create categories table
+db.exec(`
+    CREATE TABLE IF NOT EXISTS categories (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL UNIQUE
+    )
+`);
+
+// Insert default categories
+const insertCategory = db.prepare(`
+    INSERT OR IGNORE INTO categories (name)
+    VALUES (?)
+`);
+
+const defaultCategories = [
+    "Technology",
+    "Programming",
+    "Lifestyle",
+    "Education",
+    "Business",
+    "News"
+];
+
+for (const category of defaultCategories) {
+    insertCategory.run(category);
+}
 
 console.log("Database connected successfully");
 

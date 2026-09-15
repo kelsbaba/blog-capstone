@@ -18,15 +18,17 @@
             required
         >
 
-       <label for="author">Author:</label>
+        <label for="author">
+            Author:
+        </label>
 
-<input
-    type="text"
-    id="author"
-    name="author"
-    value="<%= post.author %>"
-    readonly
->
+        <input
+            type="text"
+            id="author"
+            name="author"
+            value="<%= post.author %>"
+            readonly
+        >
 
         <label for="content">
             Post Content
@@ -39,9 +41,36 @@
             required
         ><%= post.content %></textarea>
 
-        <button type="submit" class="btn">
-            Update Post
-        </button>
+        <div class="form-group category-group">
+            <label for="category_id">
+                Category
+            </label>
+
+            <select
+                name="category_id"
+                id="category_id"
+                required
+            >
+                <option value="">
+                    -- Select a category --
+                </option>
+
+                <% categories.forEach(category => { %>
+                    <option
+                        value="<%= category.id %>"
+                        <%= post.category_id === category.id ? "selected" : "" %>
+                    >
+                        <%= category.name %>
+                    </option>
+                <% }) %>
+            </select>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn">
+                Update Post
+            </button>
+        </div>
 
     </form>
 

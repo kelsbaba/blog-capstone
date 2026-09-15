@@ -10,6 +10,10 @@
         By <%= post.author %> | <%= post.date %>
     </p>
 
+    <p class="post-category">
+    Category: <strong><%= post.category_name || "Uncategorized" %></strong>
+</p>
+
     <div class="post-content">
 
         <p>

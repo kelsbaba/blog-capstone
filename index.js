@@ -67,18 +67,28 @@ function canDeleteComment(req, comment, post) {
 
 // Post database queries
 const getAllPosts = db.prepare(`
-    SELECT * FROM posts
-    ORDER BY id DESC
+    SELECT
+        posts.*,
+        categories.name AS category_name
+    FROM posts
+    LEFT JOIN categories
+        ON posts.category_id = categories.id
+    ORDER BY posts.id DESC
 `);
 
 const getPostById = db.prepare(`
-    SELECT * FROM posts
-    WHERE id = ?
+    SELECT
+        posts.*,
+        categories.name AS category_name
+    FROM posts
+    LEFT JOIN categories
+        ON posts.category_id = categories.id
+    WHERE posts.id = ?
 `);
 
 const createPost = db.prepare(`
-    INSERT INTO posts (title, content, author, date, user_id)
-    VALUES (?, ?, ?, ?, ?)
+    INSERT INTO posts (title, content, author, date, user_id, category_id)
+    VALUES (?, ?, ?, ?, ?, ?)
 `);
 
 const updatePost = db.prepare(`
@@ -131,6 +141,19 @@ const getUserByUsername = db.prepare(`
 const getUserByEmail = db.prepare(`
     SELECT * FROM users
     WHERE email = ?
+`);
+
+
+// Category database queries
+
+const getAllCategories = db.prepare(`
+    SELECT * FROM categories
+    ORDER BY name ASC
+`);
+
+const getCategoryById = db.prepare(`
+    SELECT * FROM categories
+    WHERE id = ?
 `);
 
 // Show registration form
@@ -278,19 +301,33 @@ app.get("/", (req, res) => {
 
 // Show create post form
 app.get("/create", requireLogin, (req, res) => {
-    res.render("create.ejs");
+    const categories = getAllCategories.all();
+
+    res.render("create.ejs", {
+        categories: categories
+    });
+    
 });
 
 // Create new post
 app.post("/create", requireLogin, (req, res) => {
-    const { title, content } = req.body;
+    const { title, content, category_id } = req.body;
 
    if (
     !title?.trim() ||
-    !content?.trim() 
+    !content?.trim() ||
+    !category_id
 ) {
     return res.send("All fields are required.");
 }
+
+    const categoryId = Number(category_id);
+
+    if (!categoryId) {
+        return res.send("Selected category does not exist.");
+    }
+
+
 
     const author = req.session.user.username;
 
@@ -298,7 +335,7 @@ app.post("/create", requireLogin, (req, res) => {
 
     const userId = req.session.user.id;
 
-    createPost.run(title, content, author, date, userId);
+    createPost.run(title.trim(), content.trim(), author, date, userId, category_id);
 
     res.redirect("/");
 });
@@ -415,7 +452,7 @@ app.post("/comments/:id/delete", requireLogin, (req, res) => {
 
 });
 
-// Show edit form
+// Show edit post form
 app.get("/edit/:id", requireLogin, (req, res) => {
     const postId = Number(req.params.id);
 
@@ -429,32 +466,25 @@ app.get("/edit/:id", requireLogin, (req, res) => {
         return res.status(404).send("Post not found");
     }
 
-
     if (!isPostOwner(req, post)) {
         return res.status(403).send("You can only edit your own posts.");
     }
 
+    const categories = getAllCategories.all();
 
     res.render("edit.ejs", {
-        post: post
+        post: post,
+        categories: categories
     });
 });
 
-// Update post
+
+// Update existing post
 app.post("/edit/:id", requireLogin, (req, res) => {
     const postId = Number(req.params.id);
 
     if (!isValidPostId(postId)) {
         return res.status(404).send("Post not found");
-    }
-
-    const { title, content } = req.body;
-
-    if (
-        !title?.trim() ||
-        !content?.trim()
-    ) {
-        return res.send("All fields are required.");
     }
 
     const post = getPostById.get(postId);
@@ -463,13 +493,47 @@ app.post("/edit/:id", requireLogin, (req, res) => {
         return res.status(404).send("Post not found");
     }
 
-       if (!isPostOwner(req, post)) {
-        return res.status(403).send("You can only update your own posts.");
+    if (!isPostOwner(req, post)) {
+        return res.status(403).send("You can only edit your own posts.");
     }
 
-    const author = req.session.user.username;
+    const { title, content, category_id } = req.body;
 
-    updatePost.run(title, content, author, postId);
+    if (
+        !title?.trim() ||
+        !content?.trim() ||
+        !category_id
+    ) {
+        return res.send("All fields are required.");
+    }
+
+    const categoryId = Number(category_id);
+
+    if (!Number.isInteger(categoryId) || categoryId <= 0) {
+        return res.send("Invalid category selected.");
+    }
+
+    const category = getCategoryById.get(categoryId);
+
+    if (!category) {
+        return res.send("Selected category does not exist.");
+    }
+
+    const updatePost = db.prepare(`
+        UPDATE posts
+        SET
+            title = ?,
+            content = ?,
+            category_id = ?
+        WHERE id = ?
+    `);
+
+    updatePost.run(
+        title.trim(),
+        content.trim(),
+        categoryId,
+        postId
+    );
 
     res.redirect(`/post/${postId}`);
 });

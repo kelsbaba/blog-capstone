@@ -40,9 +40,26 @@
             required
         ></textarea>
 
+        <!-- Category label -->
+<div class="form-group category-group">
+  <label for="category_id">Category</label>
+
+<select name="category_id" id="category_id" required>
+    <option value="">-- Select a category --</option>
+
+    <% categories.forEach(category => { %>
+        <option value="<%= category.id %>">
+            <%= category.name %>
+        </option>
+    <% }) %>
+</select>
+</div>
+
+<div class="form-actions">
         <button type="submit" class="btn">
             Publish Post
         </button>
+</div>
 
     </form>
 

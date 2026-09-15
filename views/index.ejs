@@ -38,6 +38,10 @@
                     By <%= post.author %> | <%= post.date %>
                 </p>
 
+                <p class="post-category">
+    Category: <strong><%= post.category_name || "Uncategorized" %></strong>
+</p>
+
                 <p>
                     <%= post.content.substring(0, 150) %>
                     <% if (post.content.length > 150) { %>
