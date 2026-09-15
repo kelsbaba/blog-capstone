@@ -50,6 +50,21 @@ function isPostOwner(req, post) {
     return post.user_id === req.session.user.id;
 }
 
+// Check whether the user can delete a comment
+function canDeleteComment(req, comment, post) {
+
+    const userId = req.session.user.id;
+
+    const isCommentAuthor =
+        comment.user_id === userId;
+
+    const isPostOwner =
+        post.user_id === userId;
+
+    return isCommentAuthor || isPostOwner;
+
+}
+
 // Post database queries
 const getAllPosts = db.prepare(`
     SELECT * FROM posts
@@ -74,6 +89,30 @@ const updatePost = db.prepare(`
 
 const deletePost = db.prepare(`
     DELETE FROM posts
+    WHERE id = ?
+`);
+
+// Comment database queries
+
+const getCommentsByPostId = db.prepare(`
+    SELECT * FROM comments
+    WHERE post_id = ?
+    ORDER BY id ASC
+`);
+
+const createComment = db.prepare(`
+    INSERT INTO comments (
+        content,
+        post_id,
+        user_id,
+        author,
+        date
+    )
+    VALUES (?, ?, ?, ?, ?)
+`);
+
+const deleteComment = db.prepare(`
+    DELETE FROM comments
     WHERE id = ?
 `);
 
@@ -278,9 +317,102 @@ app.get("/post/:id", (req, res) => {
         return res.status(404).send("Post not found");
     }
 
+    //Get comments for the post
+    const comments = getCommentsByPostId.all(postId);
+
     res.render("post.ejs", {
-        post: post
+        post: post,
+        comments: comments
+
     });
+});
+
+// Add new comment
+app.post("/post/:id/comments", requireLogin, (req, res) => {
+
+    const postId = Number(req.params.id);
+
+    // Validate post ID
+    if (!isValidPostId(postId)) {
+        return res.status(404).send("Post not found");
+    }
+
+    // Check if post exists
+    const post = getPostById.get(postId);
+
+    if (!post) {
+        return res.status(404).send("Post not found");
+    }
+
+    // Get comment content
+    const { content } = req.body;
+
+    // Validate comment
+    if (!content?.trim()) {
+        return res.send("Comment cannot be empty.");
+    }
+
+    // Get logged-in user information
+    const userId = req.session.user.id;
+    const author = req.session.user.username;
+
+    // Comment date
+    const date = new Date().toLocaleDateString();
+
+    // Save comment
+    createComment.run(
+        content.trim(),
+        postId,
+        userId,
+        author,
+        date
+    );
+
+    // Redirect back to post
+    res.redirect(`/post/${postId}`);
+
+});
+
+// Delete comment
+app.post("/comments/:id/delete", requireLogin, (req, res) => {
+
+    const commentId = Number(req.params.id);
+
+    // Validate comment ID
+    if (!Number.isInteger(commentId) || commentId <= 0) {
+        return res.status(404).send("Comment not found");
+    }
+
+    // Get the comment
+    const comment = db.prepare(`
+        SELECT * FROM comments
+        WHERE id = ?
+    `).get(commentId);
+
+    if (!comment) {
+        return res.status(404).send("Comment not found");
+    }
+
+    // Get the post belonging to the comment
+    const post = getPostById.get(comment.post_id);
+
+    if (!post) {
+        return res.status(404).send("Post not found");
+    }
+
+    // Check permission
+    if (!canDeleteComment(req, comment, post)) {
+        return res.status(403).send(
+            "You can only delete your own comments or comments on your own posts."
+        );
+    }
+
+    // Delete comment
+    deleteComment.run(commentId);
+
+    // Redirect back to the post
+    res.redirect(`/post/${comment.post_id}`);
+
 });
 
 // Show edit form

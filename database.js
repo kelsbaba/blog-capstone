@@ -42,6 +42,18 @@ if (!hasUserIdColumn) {
 }
 
 
+// Create comments table
+db.exec(`
+    CREATE TABLE IF NOT EXISTS comments (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        content TEXT NOT NULL,
+        post_id INTEGER NOT NULL,
+        user_id INTEGER NOT NULL,
+        author TEXT NOT NULL,
+        date TEXT NOT NULL
+    )
+`);
+
 
 console.log("Database connected successfully");
 
