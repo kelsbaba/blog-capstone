@@ -76,6 +76,17 @@ const getAllPosts = db.prepare(`
     ORDER BY posts.id DESC
 `);
 
+const getPostsByCategory = db.prepare(`
+    SELECT
+        posts.*,
+        categories.name AS category_name
+    FROM posts
+    LEFT JOIN categories
+        ON posts.category_id = categories.id
+    WHERE posts.category_id = ?
+    ORDER BY posts.id DESC
+`);
+
 const getPostById = db.prepare(`
     SELECT
         posts.*,
@@ -290,12 +301,42 @@ app.post("/register", async (req, res) => {
 
 });
 
+
+// Show posts by category
+app.get("/category/:id", (req, res) => {
+    const categoryId = Number(req.params.id);
+
+    if (!Number.isInteger(categoryId) || categoryId <= 0) {
+        return res.status(404).send("Category not found");
+    }
+
+    const category = getCategoryById.get(categoryId);
+
+    if (!category) {
+        return res.status(404).send("Category not found");
+    }
+
+    const posts = getPostsByCategory.all(categoryId);
+    const categories = getAllCategories.all();
+
+    res.render("index.ejs", {
+        posts: posts,
+        categories: categories,
+        selectedCategory: category
+    });
+});
+
+
+
 // Homepage
 app.get("/", (req, res) => {
     const posts = getAllPosts.all();
+    const categories = getAllCategories.all();
 
     res.render("index.ejs", {
-        posts: posts
+        posts: posts,
+        categories: categories,
+        selectedCategory: null
     });
 });
 
@@ -323,7 +364,13 @@ app.post("/create", requireLogin, (req, res) => {
 
     const categoryId = Number(category_id);
 
-    if (!categoryId) {
+    if (!Number.isInteger(categoryId) || categoryId <= 0){
+        return res.send("Invalid category selected.");
+    }
+
+    const category = getCategoryById.get(categoryId);
+
+    if (!category) {
         return res.send("Selected category does not exist.");
     }
 
@@ -335,7 +382,7 @@ app.post("/create", requireLogin, (req, res) => {
 
     const userId = req.session.user.id;
 
-    createPost.run(title.trim(), content.trim(), author, date, userId, category_id);
+    createPost.run(title.trim(), content.trim(), author, date, userId, categoryId);
 
     res.redirect("/");
 });

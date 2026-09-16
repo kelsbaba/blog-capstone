@@ -14,6 +14,23 @@
 
 </section>
 
+<nav class="category-nav">
+
+    <a href="/" class="<%= !selectedCategory ? 'active' : '' %>">
+        All Posts
+    </a>
+
+    <% categories.forEach(category => { %>
+        <a
+            href="/category/<%= category.id %>"
+            class="<%= selectedCategory && selectedCategory.id === category.id ? 'active' : '' %>"
+        >
+            <%= category.name %>
+        </a>
+    <% }) %>
+
+</nav>
+
 <section class="posts-section">
 
     <h2>Latest Blog Posts</h2>
