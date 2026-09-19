@@ -33,14 +33,20 @@
 
 <section class="posts-section">
 
+    <% if (searchTerm) { %>
+    <h2>Search Results for "<%= searchTerm %>"</h2>
+<% } else { %>
     <h2>Latest Blog Posts</h2>
+<% } %>
+   <% if (posts.length === 0) { %>
 
-    <% if (posts.length === 0) { %>
-
+    <% if (searchTerm) { %>
+        <p>No posts found for "<%= searchTerm %>".</p>
+    <% } else { %>
         <p>No posts yet. Create your first post!</p>
-
     <% } %>
 
+<% } %>
     <div class="posts-grid">
 
         <% posts.forEach(post => { %>

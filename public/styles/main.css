@@ -27,15 +27,63 @@ body {
     font-weight: bold;
 }
 
-nav a {
+/* Main navigation layout */
+
+.navbar nav {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    flex-wrap: nowrap;
+}
+
+.navbar nav a {
     color: white;
     text-decoration: none;
     margin-left: 25px;
     font-size: 16px;
+    white-space: nowrap;
 }
 
-nav a:hover {
+.navbar nav a:hover {
     text-decoration: underline;
+}
+
+/* Search */
+
+.search-form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: 25px;
+    white-space: nowrap;
+}
+
+.search-form input {
+    width: 220px;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+}
+
+.search-form input:focus {
+    border-color: #007bff;
+}
+
+.search-form button {
+    margin-top: 0;
+    padding: 8px 14px;
+    border: none;
+    border-radius: 6px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.search-form button:hover {
+    background-color: #0056b3;
 }
 
 /* Container */
@@ -192,38 +240,7 @@ form button {
     background: #c0392b;
 }
 
-/* Footer */
-
-footer {
-    text-align: center;
-    padding: 30px;
-    margin-top: 50px;
-    background: #2c3e50;
-    color: white;
-}
-
-/* Responsive */
-
-@media (max-width: 600px) {
-
-    .navbar {
-        flex-direction: column;
-        gap: 15px;
-    }
-
-    nav a {
-        margin: 0 8px;
-    }
-
-    .hero h1 {
-        font-size: 30px;
-    }
-
-    .single-post {
-        padding: 25px;
-    }
-
-}
+/* Category Navigation */
 
 .category-nav {
     display: flex;
@@ -251,4 +268,72 @@ footer {
     background-color: #333;
     color: white;
     border-color: #333;
+}
+
+/* Footer */
+
+footer {
+    text-align: center;
+    padding: 30px;
+    margin-top: 50px;
+    background: #2c3e50;
+    color: white;
+}
+
+/* Responsive */
+
+@media (max-width: 900px) {
+
+    .navbar {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .navbar nav {
+        flex-wrap: wrap;
+        justify-content: center;
+        row-gap: 12px;
+    }
+
+    .navbar nav a {
+        margin: 0 8px;
+    }
+
+    .search-form {
+        margin-left: 8px;
+    }
+}
+
+@media (max-width: 600px) {
+
+    .navbar {
+        padding: 20px;
+    }
+
+    .navbar nav {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .navbar nav a {
+        margin: 0;
+    }
+
+    .search-form {
+        margin-left: 0;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .search-form input {
+        width: 200px;
+    }
+
+    .hero h1 {
+        font-size: 30px;
+    }
+
+    .single-post {
+        padding: 25px;
+    }
 }

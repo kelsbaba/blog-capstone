@@ -76,6 +76,21 @@ const getAllPosts = db.prepare(`
     ORDER BY posts.id DESC
 `);
 
+const searchPosts = db.prepare(`
+    SELECT
+        posts.*,
+        categories.name AS category_name
+    FROM posts
+    LEFT JOIN categories
+        ON posts.category_id = categories.id
+    WHERE
+        posts.title LIKE ?
+        OR posts.content LIKE ?
+        OR posts.author LIKE ?
+        OR categories.name LIKE ?
+    ORDER BY posts.id DESC
+`);
+
 const getPostsByCategory = db.prepare(`
     SELECT
         posts.*,
@@ -385,6 +400,32 @@ app.post("/create", requireLogin, (req, res) => {
     createPost.run(title.trim(), content.trim(), author, date, userId, categoryId);
 
     res.redirect("/");
+});
+
+app.get("/search", (req, res) => {
+    const searchTerm = req.query.q?.trim() || "";
+
+    if (!searchTerm) {
+        return res.redirect("/");
+    }
+
+    const searchPattern = `%${searchTerm}%`;
+
+    const posts = searchPosts.all(
+        searchPattern,
+        searchPattern,
+        searchPattern,
+        searchPattern
+    );
+
+    const categories = getAllCategories.all();
+
+    res.render("index.ejs", {
+        posts: posts,
+        categories: categories,
+        selectedCategory: null,
+        searchTerm: searchTerm
+    });
 });
 
 // View single post
