@@ -76,6 +76,22 @@ const getAllPosts = db.prepare(`
     ORDER BY posts.id DESC
 `);
 
+const getPostsPaginated = db.prepare(`
+    SELECT
+        posts.*,
+        categories.name AS category_name
+    FROM posts
+    LEFT JOIN categories
+        ON posts.category_id = categories.id
+    ORDER BY posts.id DESC
+    LIMIT ? OFFSET ?
+`);
+
+const getTotalPosts = db.prepare(`
+    SELECT COUNT(*) AS count
+    FROM posts
+`);
+
 const searchPosts = db.prepare(`
     SELECT
         posts.*,
@@ -100,6 +116,24 @@ const getPostsByCategory = db.prepare(`
         ON posts.category_id = categories.id
     WHERE posts.category_id = ?
     ORDER BY posts.id DESC
+`);
+
+const getPostsByCategoryPaginated = db.prepare(`
+    SELECT
+        posts.*,
+        categories.name AS category_name
+    FROM posts
+    LEFT JOIN categories
+        ON posts.category_id = categories.id
+    WHERE posts.category_id = ?
+    ORDER BY posts.id DESC
+    LIMIT ? OFFSET ?
+`);
+
+const getTotalPostsByCategory = db.prepare(`
+    SELECT COUNT(*) AS count
+    FROM posts
+    WHERE category_id = ?
 `);
 
 const getPostById = db.prepare(`
@@ -331,13 +365,40 @@ app.get("/category/:id", (req, res) => {
         return res.status(404).send("Category not found");
     }
 
-    const posts = getPostsByCategory.all(categoryId);
+    const postsPerPage = 6;
+
+    const page = Math.max(
+        1,
+        Number.parseInt(req.query.page, 10) || 1
+    );
+
+    const totalPosts = getTotalPostsByCategory.get(categoryId).count;
+
+    const totalPages = Math.ceil(totalPosts / postsPerPage);
+
+    const currentPage = Math.min(
+        page,
+        Math.max(totalPages, 1)
+    );
+
+    const offset = (currentPage - 1) * postsPerPage;
+
+    const posts = getPostsByCategoryPaginated.all(
+        categoryId,
+        postsPerPage,
+        offset
+    );
+
     const categories = getAllCategories.all();
 
     res.render("index.ejs", {
         posts: posts,
         categories: categories,
-        selectedCategory: category
+        selectedCategory: category,
+        searchTerm: null,
+        currentPage: currentPage,
+        totalPages: totalPages,
+        categoryId: categoryId
     });
 });
 
@@ -345,13 +406,36 @@ app.get("/category/:id", (req, res) => {
 
 // Homepage
 app.get("/", (req, res) => {
-    const posts = getAllPosts.all();
+    const postsPerPage = 6;
+
+    const page = Math.max(
+        1,
+        Number.parseInt(req.query.page, 10) || 1
+    );
+
+    const totalPosts = getTotalPosts.get().count;
+
+    const totalPages = Math.ceil(totalPosts / postsPerPage);
+
+    const currentPage = Math.min(page, Math.max(totalPages, 1));
+
+    const offset = (currentPage - 1) * postsPerPage;
+
+    const posts = getPostsPaginated.all(
+        postsPerPage,
+        offset
+    );
+
     const categories = getAllCategories.all();
 
     res.render("index.ejs", {
         posts: posts,
         categories: categories,
-        selectedCategory: null
+        selectedCategory: null,
+        searchTerm: null,
+        currentPage: currentPage,
+        totalPages: totalPages,
+        categoryId: null
     });
 });
 
@@ -409,13 +493,62 @@ app.get("/search", (req, res) => {
         return res.redirect("/");
     }
 
+    const postsPerPage = 6;
+
+    const page = Math.max(
+        1,
+        Number.parseInt(req.query.page, 10) || 1
+    );
+
     const searchPattern = `%${searchTerm}%`;
 
-    const posts = searchPosts.all(
+    const totalPosts = db.prepare(`
+        SELECT COUNT(*) AS count
+        FROM posts
+        LEFT JOIN categories
+            ON posts.category_id = categories.id
+        WHERE
+            posts.title LIKE ?
+            OR posts.content LIKE ?
+            OR posts.author LIKE ?
+            OR categories.name LIKE ?
+    `).get(
         searchPattern,
         searchPattern,
         searchPattern,
         searchPattern
+    ).count;
+
+    const totalPages = Math.ceil(totalPosts / postsPerPage);
+
+    const currentPage = Math.min(
+        page,
+        Math.max(totalPages, 1)
+    );
+
+    const offset = (currentPage - 1) * postsPerPage;
+
+    const posts = db.prepare(`
+        SELECT
+            posts.*,
+            categories.name AS category_name
+        FROM posts
+        LEFT JOIN categories
+            ON posts.category_id = categories.id
+        WHERE
+            posts.title LIKE ?
+            OR posts.content LIKE ?
+            OR posts.author LIKE ?
+            OR categories.name LIKE ?
+        ORDER BY posts.id DESC
+        LIMIT ? OFFSET ?
+    `).all(
+        searchPattern,
+        searchPattern,
+        searchPattern,
+        searchPattern,
+        postsPerPage,
+        offset
     );
 
     const categories = getAllCategories.all();
@@ -424,7 +557,10 @@ app.get("/search", (req, res) => {
         posts: posts,
         categories: categories,
         selectedCategory: null,
-        searchTerm: searchTerm
+        searchTerm: searchTerm,
+        currentPage: currentPage,
+        totalPages: totalPages,
+        categoryId: null
     });
 });
 

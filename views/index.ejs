@@ -14,73 +14,196 @@
 
 </section>
 
+<!-- Category Navigation -->
+
 <nav class="category-nav">
 
-    <a href="/" class="<%= !selectedCategory ? 'active' : '' %>">
+    <a
+        href="/"
+        class="<%= !selectedCategory ? 'active' : '' %>"
+    >
         All Posts
     </a>
 
     <% categories.forEach(category => { %>
+
         <a
             href="/category/<%= category.id %>"
             class="<%= selectedCategory && selectedCategory.id === category.id ? 'active' : '' %>"
         >
             <%= category.name %>
         </a>
+
     <% }) %>
 
 </nav>
 
+<!-- Posts Section -->
+
 <section class="posts-section">
 
-    <% if (searchTerm) { %>
-    <h2>Search Results for "<%= searchTerm %>"</h2>
-<% } else { %>
-    <h2>Latest Blog Posts</h2>
-<% } %>
-   <% if (posts.length === 0) { %>
+    <!-- Section Heading -->
 
     <% if (searchTerm) { %>
-        <p>No posts found for "<%= searchTerm %>".</p>
+
+        <h2>
+            Search Results for "<%= searchTerm %>"
+        </h2>
+
+    <% } else if (selectedCategory) { %>
+
+        <h2>
+            <%= selectedCategory.name %> Posts
+        </h2>
+
     <% } else { %>
-        <p>No posts yet. Create your first post!</p>
+
+        <h2>
+            Latest Blog Posts
+        </h2>
+
     <% } %>
 
-<% } %>
-    <div class="posts-grid">
 
-        <% posts.forEach(post => { %>
+    <!-- No Posts Message -->
 
-            <article class="post-card">
+    <% if (posts.length === 0) { %>
 
-                <h3>
-                    <%= post.title %>
-                </h3>
+        <% if (searchTerm) { %>
 
-                <p class="post-meta">
-                    By <%= post.author %> | <%= post.date %>
-                </p>
+            <p>
+                No posts found for "<%= searchTerm %>".
+            </p>
 
-                <p class="post-category">
-    Category: <strong><%= post.category_name || "Uncategorized" %></strong>
-</p>
+        <% } else if (selectedCategory) { %>
 
-                <p>
-                    <%= post.content.substring(0, 150) %>
-                    <% if (post.content.length > 150) { %>
-                        ...
-                    <% } %>
-                </p>
+            <p>
+                No posts found in the <%= selectedCategory.name %> category.
+            </p>
 
-                <a href="/post/<%= post.id %>" class="read-more">
-                    Read More →
+        <% } else { %>
+
+            <p>
+                No posts yet. Create your first post!
+            </p>
+
+        <% } %>
+
+    <% } %>
+
+
+    <!-- Posts Grid -->
+
+    <% if (posts.length > 0) { %>
+
+        <div class="posts-grid">
+
+            <% posts.forEach(post => { %>
+
+                <article class="post-card">
+
+                    <h3>
+                        <%= post.title %>
+                    </h3>
+
+                    <p class="post-meta">
+                        By <%= post.author %> | <%= post.date %>
+                    </p>
+
+                    <p class="post-category">
+                        Category:
+                        <strong>
+                            <%= post.category_name || "Uncategorized" %>
+                        </strong>
+                    </p>
+
+                    <p>
+                        <%= post.content.substring(0, 150) %>
+
+                        <% if (post.content.length > 150) { %>
+                            ...
+                        <% } %>
+                    </p>
+
+                    <a
+                        href="/post/<%= post.id %>"
+                        class="read-more"
+                    >
+                        Read More →
+                    </a>
+
+                </article>
+
+            <% }) %>
+
+        </div>
+
+    <% } %>
+
+
+    <!-- Pagination -->
+
+    <% if (totalPages > 1) { %>
+
+        <div class="pagination">
+
+            <!-- Previous -->
+
+            <% if (currentPage > 1) { %>
+
+                <a
+                    href="<%= searchTerm
+                        ? '/search?q=' + encodeURIComponent(searchTerm) + '&page=' + (currentPage - 1)
+                        : categoryId
+                            ? '/category/' + categoryId + '?page=' + (currentPage - 1)
+                            : '/?page=' + (currentPage - 1)
+                    %>"
+                >
+                    ← Previous
                 </a>
 
-            </article>
+            <% } %>
 
-        <% }) %>
 
-    </div>
+            <!-- Page Numbers -->
+
+            <% for (let page = 1; page <= totalPages; page++) { %>
+
+                <a
+                    href="<%= searchTerm
+                        ? '/search?q=' + encodeURIComponent(searchTerm) + '&page=' + page
+                        : categoryId
+                            ? '/category/' + categoryId + '?page=' + page
+                            : '/?page=' + page
+                    %>"
+                    class="<%= page === currentPage ? 'active' : '' %>"
+                >
+                    <%= page %>
+                </a>
+
+            <% } %>
+
+
+            <!-- Next -->
+
+            <% if (currentPage < totalPages) { %>
+
+                <a
+                    href="<%= searchTerm
+                        ? '/search?q=' + encodeURIComponent(searchTerm) + '&page=' + (currentPage + 1)
+                        : categoryId
+                            ? '/category/' + categoryId + '?page=' + (currentPage + 1)
+                            : '/?page=' + (currentPage + 1)
+                    %>"
+                >
+                    Next →
+                </a>
+
+            <% } %>
+
+        </div>
+
+    <% } %>
 
 </section>
 
