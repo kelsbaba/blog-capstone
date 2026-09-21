@@ -1,0 +1,107 @@
+<%- include("partials/header.ejs") %>
+
+<section class="profile-section">
+
+    <div class="profile-card">
+
+        <div class="profile-avatar">
+            👤
+        </div>
+
+        <h1>
+            <%= profile.username %>
+        </h1>
+
+        <p class="profile-email">
+            <%= profile.email %>
+        </p>
+
+       <p class="profile-date">
+    Member since:
+    <%= new Date(profile.created_at).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric"
+    }) %>
+</p>
+
+        <div class="profile-stats">
+
+            <div class="profile-stat">
+                <strong><%= profile.post_count %></strong>
+                <span>Posts</span>
+            </div>
+
+            <div class="profile-stat">
+                <strong><%= profile.comment_count %></strong>
+                <span>Comments</span>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="profile-posts">
+
+        <h2>
+            Posts by <%= profile.username %>
+        </h2>
+
+        <% if (posts.length === 0) { %>
+
+            <p>
+                This user hasn't published any posts yet.
+            </p>
+
+        <% } else { %>
+
+            <div class="posts-grid">
+
+                <% posts.forEach(post => { %>
+
+                    <article class="post-card">
+
+                        <h3>
+                            <%= post.title %>
+                        </h3>
+
+                        <p class="post-meta">
+                            <%= post.date %>
+                        </p>
+
+                        <p class="post-category">
+                            Category:
+                            <strong>
+                                <%= post.category_name || "Uncategorized" %>
+                            </strong>
+                        </p>
+
+                        <p>
+                            <%= post.content.substring(0, 150) %>
+
+                            <% if (post.content.length > 150) { %>
+                                ...
+                            <% } %>
+                        </p>
+
+                        <a
+                            href="/post/<%= post.id %>"
+                            class="read-more"
+                        >
+                            Read More →
+                        </a>
+
+                    </article>
+
+                <% }) %>
+
+            </div>
+
+        <% } %>
+
+    </div>
+
+</section>
+
+<%- include("partials/footer.ejs") %>

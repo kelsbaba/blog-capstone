@@ -106,9 +106,13 @@
                         <%= post.title %>
                     </h3>
 
-                    <p class="post-meta">
-                        By <%= post.author %> | <%= post.date %>
-                    </p>
+                   <p class="post-meta">
+    By
+    <a href="/profile/<%= post.user_id %>">
+        <%= post.author %>
+    </a>
+    | <%= post.date %>
+</p>
 
                     <p class="post-category">
                         Category:

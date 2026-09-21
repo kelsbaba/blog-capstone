@@ -20,21 +20,29 @@
         </div>
 
         <nav>
+
             <a href="/">Home</a>
+
             <a href="/create">Create Post</a>
 
-              <% if (currentUser) { %>
+            <% if (currentUser) { %>
 
-                <span>
+                <span class="welcome-message">
                     Welcome, <%= currentUser.username %> 👋
                 </span>
 
-                <form action="/logout" method="POST" style="display: inline;">
+                <a href="/profile/<%= currentUser.id %>">
+                    My Profile
+                </a>
 
+                <form
+                    action="/logout"
+                    method="POST"
+                    class="logout-form"
+                >
                     <button type="submit">
                         Logout
                     </button>
-
                 </form>
 
             <% } else { %>
@@ -45,15 +53,22 @@
 
             <% } %>
 
-            <form action="/search" method="GET" class="search-form">
-    <input
-        type="text"
-        name="q"
-        placeholder="Search posts..."
-        required
-    >
-    <button type="submit">Search</button>
-</form>
+            <form
+                action="/search"
+                method="GET"
+                class="search-form"
+            >
+                <input
+                    type="text"
+                    name="q"
+                    placeholder="Search posts..."
+                    required
+                >
+
+                <button type="submit">
+                    Search
+                </button>
+            </form>
 
         </nav>
 

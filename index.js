@@ -211,6 +211,34 @@ const getAllCategories = db.prepare(`
     ORDER BY name ASC
 `);
 
+const getUserProfile = db.prepare(`
+    SELECT
+        users.id,
+        users.username,
+        users.email,
+        users.created_at,
+        COUNT(DISTINCT posts.id) AS post_count,
+        COUNT(DISTINCT comments.id) AS comment_count
+    FROM users
+    LEFT JOIN posts
+        ON users.id = posts.user_id
+    LEFT JOIN comments
+        ON users.id = comments.user_id
+    WHERE users.id = ?
+    GROUP BY users.id
+`);
+
+const getUserPosts = db.prepare(`
+    SELECT
+        posts.*,
+        categories.name AS category_name
+    FROM posts
+    LEFT JOIN categories
+        ON posts.category_id = categories.id
+    WHERE posts.user_id = ?
+    ORDER BY posts.id DESC
+`);
+
 const getCategoryById = db.prepare(`
     SELECT * FROM categories
     WHERE id = ?
@@ -563,6 +591,30 @@ app.get("/search", (req, res) => {
         categoryId: null
     });
 });
+
+
+// Profile route 
+app.get("/profile/:id", (req, res) => {
+    const userId = Number(req.params.id);
+
+    if (!Number.isInteger(userId) || userId <= 0) {
+        return res.status(404).send("User not found");
+    }
+
+    const profile = getUserProfile.get(userId);
+
+    if (!profile) {
+        return res.status(404).send("User not found");
+    }
+
+    const posts = getUserPosts.all(userId);
+
+    res.render("profile.ejs", {
+        profile: profile,
+        posts: posts
+    });
+});
+
 
 // View single post
 app.get("/post/:id", (req, res) => {
