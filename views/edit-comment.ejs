@@ -1,0 +1,39 @@
+<%- include("partials/header.ejs") %>
+
+<section class="form-section">
+
+    <h1>Edit Comment</h1>
+
+    <form action="/comment/<%= comment.id %>/edit" method="POST">
+
+        <label for="content">
+            Comment
+        </label>
+
+        <textarea
+            id="content"
+            name="content"
+            rows="6"
+            required
+        ><%= comment.content %></textarea>
+
+        <div class="form-actions">
+
+            <button type="submit" class="btn">
+                Save Changes
+            </button>
+
+            <a
+                href="/post/<%= comment.post_id %>"
+                class="btn"
+            >
+                Cancel
+            </a>
+
+        </div>
+
+    </form>
+
+</section>
+
+<%- include("partials/footer.ejs") %>

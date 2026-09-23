@@ -170,6 +170,12 @@ const getCommentsByPostId = db.prepare(`
     ORDER BY id ASC
 `);
 
+const getCommentById = db.prepare(`
+    SELECT *
+    FROM comments
+    WHERE id = ?
+`);
+
 const createComment = db.prepare(`
     INSERT INTO comments (
         content,
@@ -183,6 +189,12 @@ const createComment = db.prepare(`
 
 const deleteComment = db.prepare(`
     DELETE FROM comments
+    WHERE id = ?
+`);
+
+const updateComment = db.prepare(`
+    UPDATE comments
+    SET content = ?
     WHERE id = ?
 `);
 
@@ -615,6 +627,55 @@ app.get("/profile/:id", (req, res) => {
     });
 });
 
+// Edit comment route 
+app.get("/comment/:id/edit", requireLogin, (req, res) => {
+    const commentId = Number(req.params.id);
+
+    if (!Number.isInteger(commentId) || commentId <= 0) {
+        return res.status(404).send("Comment not found");
+    }
+
+    const comment = getCommentById.get(commentId);
+
+    if (!comment) {
+        return res.status(404).send("Comment not found");
+    }
+
+    if (comment.user_id !== req.session.user.id) {
+        return res.status(403).send("You are not allowed to edit this comment");
+    }
+
+    res.render("edit-comment.ejs", {
+        comment: comment
+    });
+});
+
+app.post("/comment/:id/edit", requireLogin, (req, res) => {
+    const commentId = Number(req.params.id);
+    const content = req.body.content?.trim();
+
+    if (!Number.isInteger(commentId) || commentId <= 0) {
+        return res.status(404).send("Comment not found");
+    }
+
+    if (!content) {
+        return res.status(400).send("Comment cannot be empty");
+    }
+
+    const comment = getCommentById.get(commentId);
+
+    if (!comment) {
+        return res.status(404).send("Comment not found");
+    }
+
+    if (comment.user_id !== req.session.user.id) {
+        return res.status(403).send("You are not allowed to edit this comment");
+    }
+
+    updateComment.run(content, commentId);
+
+    res.redirect(`/post/${comment.post_id}`);
+});
 
 // View single post
 app.get("/post/:id", (req, res) => {

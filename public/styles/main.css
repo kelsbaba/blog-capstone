@@ -490,3 +490,25 @@ footer {
         font-size: 24px;
     }
 }
+
+/* Comment Actions */
+
+.comment {
+    margin-bottom: 30px;
+}
+
+.comment-meta {
+    margin-bottom: 8px;
+}
+
+.comment-content {
+    margin-bottom: 15px;
+    line-height: 1.6;
+}
+
+.comment .btn {
+    margin-top: 5px;
+    margin-right: 8px;
+    padding: 8px 14px;
+    font-size: 14px;
+}

@@ -11,8 +11,11 @@
     </p>
 
     <p class="post-category">
-    Category: <strong><%= post.category_name || "Uncategorized" %></strong>
-</p>
+        Category:
+        <strong>
+            <%= post.category_name || "Uncategorized" %>
+        </strong>
+    </p>
 
     <div class="post-content">
 
@@ -22,71 +25,19 @@
 
     </div>
 
+
+    <!-- Post Actions -->
+
     <% if (currentUser && currentUser.id === post.user_id) { %>
 
-    <div class="post-actions">
+        <div class="post-actions">
 
-        <a href="/edit/<%= post.id %>" class="btn">
-            Edit Post
-        </a>
-
-        <form
-            action="/delete/<%= post.id %>"
-            method="POST"
-            style="display:inline;"
-        >
-
-            <button
-                type="submit"
-                class="btn delete-btn"
-                onclick="return confirm('Delete this post?')"
-            >
-                Delete Post
-            </button>
-
-        </form>
-
-    </div>
-    <% } %>
-
-        <!-- Comments Section -->
-
-    <section class="comments-section">
-
-        <h2>Comments</h2>
-
-        <% if (comments.length === 0) { %>
-
-            <p>No comments yet. Be the first to comment!</p>
-
-        <% } else { %>
-
-           <% comments.forEach(comment => { %>
-
-    <div class="comment">
-
-        <p class="comment-meta">
-            <strong>
-                <%= comment.author %>
-            </strong>
-
-            | <%= comment.date %>
-        </p>
-
-        <p class="comment-content">
-            <%= comment.content %>
-        </p>
-
-        <% if (
-            currentUser &&
-            (
-                currentUser.id === comment.user_id ||
-                currentUser.id === post.user_id
-            )
-        ) { %>
+            <a href="/edit/<%= post.id %>" class="btn">
+                Edit Post
+            </a>
 
             <form
-                action="/comments/<%= comment.id %>/delete"
+                action="/delete/<%= post.id %>"
                 method="POST"
                 style="display:inline;"
             >
@@ -94,57 +45,137 @@
                 <button
                     type="submit"
                     class="btn delete-btn"
-                    onclick="return confirm('Delete this comment?')"
+                    onclick="return confirm('Delete this post?')"
                 >
-                    Delete Comment
-                </button>
-
-            </form>
-
-        <% } %>
-
-    </div>
-
-<% }) %>
-
-        <% } %>
-
-            <!-- Add Comment Form -->
-
-    <% if (currentUser) { %>
-
-        <div class="add-comment">
-
-            <h3>Leave a comment</h3>
-
-            <form
-                action="/post/<%= post.id %>/comments"
-                method="POST"
-            >
-
-                <textarea
-                    name="content"
-                    placeholder="Write your comment here..."
-                    rows="4"
-                    required
-                ></textarea>
-
-                <button type="submit" class="btn">
-                    Submit Comment
+                    Delete Post
                 </button>
 
             </form>
 
         </div>
 
-    <% } else { %>
-
-        <p>
-            <a href="/login">Login</a>
-            to leave a comment.
-        </p>
-
     <% } %>
+
+
+    <!-- Comments Section -->
+
+    <section class="comments-section">
+
+        <h2>Comments</h2>
+
+        <% if (comments.length === 0) { %>
+
+            <p>
+                No comments yet. Be the first to comment!
+            </p>
+
+        <% } else { %>
+
+            <% comments.forEach(comment => { %>
+
+                <div class="comment">
+
+                    <p class="comment-meta">
+
+                        <strong>
+                            <%= comment.author %>
+                        </strong>
+
+                        | <%= comment.date %>
+
+                    </p>
+
+
+                    <p class="comment-content">
+                        <%= comment.content %>
+                    </p>
+
+
+                    <!-- Comment Actions -->
+
+                    <% if (currentUser && currentUser.id === comment.user_id) { %>
+
+                        <a
+                            href="/comment/<%= comment.id %>/edit"
+                            class="btn"
+                        >
+                            Edit Comment
+                        </a>
+
+                    <% } %>
+
+
+                    <!-- Delete Comment -->
+
+                    <% if (
+                        currentUser &&
+                        (
+                            currentUser.id === comment.user_id ||
+                            currentUser.id === post.user_id
+                        )
+                    ) { %>
+
+                        <form
+                            action="/comments/<%= comment.id %>/delete"
+                            method="POST"
+                            style="display:inline;"
+                        >
+
+                            <button
+                                type="submit"
+                                class="btn delete-btn"
+                                onclick="return confirm('Delete this comment?')"
+                            >
+                                Delete Comment
+                            </button>
+
+                        </form>
+
+                    <% } %>
+
+                </div>
+
+            <% }) %>
+
+        <% } %>
+
+
+        <!-- Add Comment Form -->
+
+        <% if (currentUser) { %>
+
+            <div class="add-comment">
+
+                <h3>Leave a comment</h3>
+
+                <form
+                    action="/post/<%= post.id %>/comments"
+                    method="POST"
+                >
+
+                    <textarea
+                        name="content"
+                        placeholder="Write your comment here..."
+                        rows="4"
+                        required
+                    ></textarea>
+
+                    <button type="submit" class="btn">
+                        Submit Comment
+                    </button>
+
+                </form>
+
+            </div>
+
+        <% } else { %>
+
+            <p>
+                <a href="/login">Login</a>
+                to leave a comment.
+            </p>
+
+        <% } %>
 
     </section>
 
