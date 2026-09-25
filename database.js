@@ -43,6 +43,17 @@ if (!hasUserIdColumn) {
     `);
 }
 
+const hasImageColumn = postColumns.some(
+    column => column.name === "image"
+);
+
+if (!hasImageColumn) {
+    db.exec(`
+        ALTER TABLE posts
+        ADD COLUMN image TEXT
+    `);
+}
+
 // Create users table
 db.exec(`
     CREATE TABLE IF NOT EXISTS users (

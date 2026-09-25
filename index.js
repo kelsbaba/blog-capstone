@@ -2,9 +2,56 @@ import express from "express";
 import bcrypt from "bcrypt";
 import session from "express-session";
 import db from "./database.js";
+import multer from "multer";
 
 const app = express();
 const port = 3000;
+
+// =========================
+// Image Upload Configuration
+// =========================
+
+const storage = multer.diskStorage({
+
+    destination: (req, file, cb) => {
+        cb(null, "public/uploads/");
+    },
+
+    filename: (req, file, cb) => {
+
+        const uniqueName =
+            Date.now() +
+            "-" +
+            file.originalname.replace(/\s+/g, "-");
+
+        cb(null, uniqueName);
+    }
+
+});
+
+const upload = multer({
+    storage: storage,
+
+    fileFilter: (req, file, cb) => {
+
+        const allowedTypes = [
+            "image/jpeg",
+            "image/png",
+            "image/gif",
+            "image/webp"
+        ];
+
+        if (allowedTypes.includes(file.mimetype)) {
+            cb(null, true);
+        } else {
+            cb(new Error("Only JPEG, PNG, GIF, and WebP images are allowed"));
+        }
+    },
+
+    limits: {
+        fileSize: 5 * 1024 * 1024
+    }
+});
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
@@ -147,8 +194,8 @@ const getPostById = db.prepare(`
 `);
 
 const createPost = db.prepare(`
-    INSERT INTO posts (title, content, author, date, user_id, category_id)
-    VALUES (?, ?, ?, ?, ?, ?)
+    INSERT INTO posts (title, content, author, date, user_id, category_id, image)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
 `);
 
 const updatePost = db.prepare(`
@@ -521,7 +568,10 @@ app.get("/create", requireLogin, (req, res) => {
 });
 
 // Create new post
-app.post("/create", requireLogin, (req, res) => {
+app.post("/create",
+     requireLogin,
+     upload.single("image"),
+      (req, res) => {
     const { title, content, category_id } = req.body;
 
    if (
@@ -552,7 +602,11 @@ app.post("/create", requireLogin, (req, res) => {
 
     const userId = req.session.user.id;
 
-    createPost.run(title.trim(), content.trim(), author, date, userId, categoryId);
+    const image = req.file
+    ? `/uploads/${req.file.filename}`
+    : null;
+
+    createPost.run(title.trim(), content.trim(), author, date, userId, categoryId, image);
 
     res.redirect("/");
 });
@@ -903,7 +957,9 @@ app.get("/edit/:id", requireLogin, (req, res) => {
 
 
 // Update existing post
-app.post("/edit/:id", requireLogin, (req, res) => {
+app.post("/edit/:id", requireLogin,
+    upload.single("image"),
+     (req, res) => {
     const postId = Number(req.params.id);
 
     if (!isValidPostId(postId)) {
@@ -942,12 +998,18 @@ app.post("/edit/:id", requireLogin, (req, res) => {
         return res.send("Selected category does not exist.");
     }
 
+     // Keep existing image if no new image was selected
+        const image = req.file
+            ? `/uploads/${req.file.filename}`
+            : post.image;
+
     const updatePost = db.prepare(`
         UPDATE posts
         SET
             title = ?,
             content = ?,
-            category_id = ?
+            category_id = ?,
+            image = ?
         WHERE id = ?
     `);
 
@@ -955,6 +1017,7 @@ app.post("/edit/:id", requireLogin, (req, res) => {
         title.trim(),
         content.trim(),
         categoryId,
+        image,
         postId
     );
 

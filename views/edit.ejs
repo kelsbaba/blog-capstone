@@ -4,7 +4,11 @@
 
     <h1>Edit Blog Post ✏️</h1>
 
-    <form action="/edit/<%= post.id %>" method="POST">
+    <form
+        action="/edit/<%= post.id %>"
+        method="POST"
+        enctype="multipart/form-data"
+    >
 
         <label for="title">
             Post Title
@@ -42,6 +46,7 @@
         ><%= post.content %></textarea>
 
         <div class="form-group category-group">
+
             <label for="category_id">
                 Category
             </label>
@@ -51,25 +56,72 @@
                 id="category_id"
                 required
             >
+
                 <option value="">
                     -- Select a category --
                 </option>
 
                 <% categories.forEach(category => { %>
+
                     <option
                         value="<%= category.id %>"
                         <%= post.category_id === category.id ? "selected" : "" %>
                     >
                         <%= category.name %>
                     </option>
+
                 <% }) %>
+
             </select>
+
+        </div>
+
+        <!-- Current Post Image -->
+
+        <% if (post.image) { %>
+
+            <div class="edit-post-image">
+
+                <p>
+                    Current Image
+                </p>
+
+                <img
+                    src="<%= post.image %>"
+                    alt="<%= post.title %>"
+                >
+
+            </div>
+
+        <% } %>
+
+        <!-- New Post Image -->
+
+        <div class="form-group">
+
+            <label for="image">
+                Replace Image
+            </label>
+
+            <input
+                type="file"
+                id="image"
+                name="image"
+                accept="image/jpeg,image/png,image/gif,image/webp"
+            >
+
+            <small>
+                Leave this empty to keep the current image.
+            </small>
+
         </div>
 
         <div class="form-actions">
+
             <button type="submit" class="btn">
                 Update Post
             </button>
+
         </div>
 
     </form>

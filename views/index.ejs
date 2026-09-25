@@ -106,13 +106,28 @@
                         <%= post.title %>
                     </h3>
 
-                   <p class="post-meta">
-    By
-    <a href="/profile/<%= post.user_id %>">
-        <%= post.author %>
-    </a>
-    | <%= post.date %>
-</p>
+                    <!-- Post Image -->
+
+                    <% if (post.image) { %>
+
+                        <div class="post-card-image">
+
+                            <img
+                                src="<%= post.image %>"
+                                alt="<%= post.title %>"
+                            >
+
+                        </div>
+
+                    <% } %>
+
+                    <p class="post-meta">
+                        By
+                        <a href="/profile/<%= post.user_id %>">
+                            <%= post.author %>
+                        </a>
+                        | <%= post.date %>
+                    </p>
 
                     <p class="post-category">
                         Category:

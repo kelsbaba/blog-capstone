@@ -541,3 +541,44 @@ footer {
 .like-count {
     font-weight: 600;
 }
+
+/* =========================
+   Post Card Images
+   ========================= */
+
+.post-card-image {
+    width: 100%;
+    height: 180px;
+    margin: 15px 0;
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+.post-card-image img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* =========================
+   Edit Post Image
+   ========================= */
+
+.edit-post-image {
+    margin: 20px 0;
+}
+
+.edit-post-image p {
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.edit-post-image img {
+    display: block;
+    width: 300px;
+    max-width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+}
