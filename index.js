@@ -198,6 +198,37 @@ const updateComment = db.prepare(`
     WHERE id = ?
 `);
 
+
+// =========================
+// Like Queries
+// =========================
+
+const getLike = db.prepare(`
+    SELECT *
+    FROM likes
+    WHERE post_id = ? AND user_id = ?
+`);
+
+const createLike = db.prepare(`
+    INSERT INTO likes (
+        post_id,
+        user_id
+    )
+    VALUES (?, ?)
+`);
+
+const deleteLike = db.prepare(`
+    DELETE FROM likes
+    WHERE post_id = ? AND user_id = ?
+`);
+
+const getLikeCount = db.prepare(`
+    SELECT COUNT(*) AS count
+    FROM likes
+    WHERE post_id = ?
+`);
+
+
 // User database queries
 
 const createUser = db.prepare(`
@@ -694,9 +725,23 @@ app.get("/post/:id", (req, res) => {
     //Get comments for the post
     const comments = getCommentsByPostId.all(postId);
 
+    // Get total likes for the post
+    const likeCount = getLikeCount.get(postId).count;
+
+    let userHasLiked = false;
+
+    if (req.session.user) {
+        userHasLiked = !!getLike.get(
+            postId,
+            req.session.user.id
+        );
+    }
+
     res.render("post.ejs", {
         post: post,
-        comments: comments
+        comments: comments,
+        likeCount: likeCount,
+        userHasLiked: userHasLiked
 
     });
 });
@@ -746,6 +791,47 @@ app.post("/post/:id/comments", requireLogin, (req, res) => {
     res.redirect(`/post/${postId}`);
 
 });
+
+// =========================
+// Like / Unlike Post
+// =========================
+
+app.post("/post/:id/like", requireLogin, (req, res) => {
+
+    const postId = Number(req.params.id);
+    const userId = req.session.user.id;
+
+    // Validate post ID
+    if (!Number.isInteger(postId) || postId <= 0) {
+        return res.status(404).send("Post not found");
+    }
+
+    // Check that the post exists
+    const post = getPostById.get(postId);
+
+    if (!post) {
+        return res.status(404).send("Post not found");
+    }
+
+    // Check whether the user already liked the post
+    const existingLike = getLike.get(postId, userId);
+
+    if (existingLike) {
+
+        // Unlike the post
+        deleteLike.run(postId, userId);
+
+    } else {
+
+        // Like the post
+        createLike.run(postId, userId);
+
+    }
+
+    // Return to the post
+    res.redirect(`/post/${postId}`);
+});
+
 
 // Delete comment
 app.post("/comments/:id/delete", requireLogin, (req, res) => {

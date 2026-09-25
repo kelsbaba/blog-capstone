@@ -25,6 +25,42 @@
 
     </div>
 
+    <div class="like-section">
+
+    <% if (currentUser) { %>
+
+        <form
+            action="/post/<%= post.id %>/like"
+            method="POST"
+            style="display:inline;"
+        >
+            <button type="submit" class="like-btn">
+
+                <% if (userHasLiked) { %>
+                    💔 Unlike
+                <% } else { %>
+                    ❤️ Like
+                <% } %>
+
+            </button>
+        </form>
+
+    <% } else { %>
+
+        <p>
+            <a href="/login">Login</a>
+            to like this post.
+        </p>
+
+    <% } %>
+
+    <span class="like-count">
+        ❤️ <%= likeCount %>
+        <%= likeCount === 1 ? "Like" : "Likes" %>
+    </span>
+
+</div>
+
 
     <!-- Post Actions -->
 

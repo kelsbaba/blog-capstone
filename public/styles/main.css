@@ -512,3 +512,32 @@ footer {
     padding: 8px 14px;
     font-size: 14px;
 }
+
+/* =========================
+   Like Section
+   ========================= */
+
+.like-section {
+    margin: 20px 0;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.like-btn {
+    border: none;
+    padding: 10px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    background-color: #e74c3c;
+    color: white;
+}
+
+.like-btn:hover {
+    opacity: 0.85;
+}
+
+.like-count {
+    font-weight: 600;
+}
