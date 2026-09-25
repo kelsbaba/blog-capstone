@@ -5,7 +5,7 @@ import db from "./database.js";
 import multer from "multer";
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 // =========================
 // Image Upload Configuration
