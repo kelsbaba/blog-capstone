@@ -3,6 +3,7 @@ import express from "express";
 import bcrypt from "bcrypt";
 import session from "express-session";
 import multer from "multer";
+import { v2 as cloudinary } from "cloudinary";
 import {
     createUser,
     getUserByUsername,
@@ -39,23 +40,13 @@ const port = process.env.PORT || 3000;
 // Image Upload Configuration
 // =========================
 
-const storage = multer.diskStorage({
-
-    destination: (req, file, cb) => {
-        cb(null, "public/uploads/");
-    },
-
-    filename: (req, file, cb) => {
-
-        const uniqueName =
-            Date.now() +
-            "-" +
-            file.originalname.replace(/\s+/g, "-");
-
-        cb(null, uniqueName);
-    }
-
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
 });
+
+const storage = multer.memoryStorage();
 
 const upload = multer({
     storage: storage,
@@ -403,19 +394,24 @@ app.post("/create",
     if (!category) {
         return res.send("Selected category does not exist.");
     }
-
-
-
     const author = req.session.user.username;
 
     const date = new Date().toLocaleDateString();
 
     const userId = req.session.user.id;
 
-    const image = req.file
-    ? `/uploads/${req.file.filename}`
-    : null;
+    let image = null;
 
+if (req.file) {
+    const result = await cloudinary.uploader.upload(
+        `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`,
+        {
+            folder: "blog-capstone"
+        }
+    );
+
+    image = result.secure_url;
+}
   await createPost(title.trim(), content.trim(), author, date, userId, categoryId, image);
 
     res.redirect("/");
@@ -778,10 +774,18 @@ app.post(
         }
 
         // Keep existing image if no new image was selected
-        const image = req.file
-            ? `/uploads/${req.file.filename}`
-            : post.image;
+let image = post.image;
 
+if (req.file) {
+    const result = await cloudinary.uploader.upload(
+        `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`,
+        {
+            folder: "blog-capstone"
+        }
+    );
+
+    image = result.secure_url;
+}
         await updatePost(
             title.trim(),
             content.trim(),
