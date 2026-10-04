@@ -357,6 +357,15 @@ and added three supporting indexes.
 
 A `check-user-columns.js` script was used to inspect the `users` table. It does not change the schema and is therefore not considered a schema migration.
 
+### Migration Scripts
+
+The following scripts were used during the evolution of the PostgreSQL database:
+
+- `add-profile-columns.js` — adds `display_name`, `bio`, and `profile_image` columns to the `users` table.
+- `add-friendships-table.js` — creates the `friendships` table with foreign keys, status validation, self-friend prevention, and unique sender/receiver pairs.
+- `add-messages-table.js` — creates the `messages` table and its supporting indexes for sender/receiver relationships and message creation time.
+These scripts are retained as part of the project's database evolution history and provide a record of the schema changes introduced during development.
+
 ---
 
 ## 12. Complete Schema Inventory
