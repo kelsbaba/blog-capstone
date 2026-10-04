@@ -1,151 +1,216 @@
-# 📝 My Blog
+# Blog Capstone
 
-A simple and responsive blog web application built with
-Node.js, Express, EJS, and SQLite.
+A full-stack blog application built with Node.js, Express.js, EJS, PostgreSQL, JavaScript, HTML5, and CSS3.
 
-This project allows users to create, read, update,
-and delete blog posts.
+The project started as a traditional CRUD blog and evolved into a complete social blogging platform with authentication, user profiles, post ownership controls, comments, likes, friendships, private messaging, image uploads, and production deployment.
 
-## 🚀 Features
+## 🚀 Live Demo
 
-- Create new blog posts
-- View all blog posts
-- View individual blog posts
-- Edit existing blog posts
-- Delete blog posts
-- SQLite database storage
-- Data persistence after server restart
-- Responsive design
-- Form validation
-- Invalid post ID handling
+https://blog-capstone-wy3x.onrender.com
 
-## 🛠️ Technologies Used
+## 📂 GitHub Repository
 
-### Frontend
+https://github.com/kelsbaba/blog-capstone
 
-- HTML5
-- CSS3
-- EJS
+## ✨ Features
+
+### 🔐 Authentication
+- User registration and login
+- Password hashing with bcrypt
+- Session-based authentication
+- Protected routes
+- Login/logout functionality
+
+### 👤 User Profiles
+- User profile pages
+- Display name
+- Bio
+- Profile image
+- Member information
+- Post and comment statistics
+
+### 📝 Blog Posts
+- Create posts
+- View posts
+- Edit posts
+- Delete posts
+- Post ownership controls
+- Categories
+- Search
+- Pagination
+
+### 💬 Comments
+- Add comments
+- Edit comments
+- Delete comments
+- Comment ownership controls
+
+### ❤️ Likes
+- Like posts
+- Unlike posts
+- Display post like counts
+
+### 🤝 Friendships
+- Send friend requests
+- Accept friend requests
+- Reject friend requests
+- View friends
+- Friendship status management
+
+### 💌 Private Messaging
+- Private conversations between users
+- Send messages
+- Read/unread message tracking
+- Unread message counts
+- Socket.IO integration for real-time communication
+
+### 🖼️ Image Uploads
+- Cloudinary image storage
+- Multer file handling
+- JPEG, PNG, GIF, and WebP support
+- Maximum upload size of 5 MB
+- Profile image uploads
+- Blog post image uploads
+
+### ☁️ Deployment
+- Deployed on Render
+- PostgreSQL database hosted with Neon
+- Cloudinary used for production image storage
+- Environment variables used for sensitive configuration
+
+## 🛠️ Tech Stack
 
 ### Backend
-
 - Node.js
 - Express.js
+- PostgreSQL
+- `pg`
+- Socket.IO
 
-### Database
+### Frontend
+- EJS
+- HTML5
+- CSS3
+- JavaScript
 
-- SQLite
-- better-sqlite3
+### Authentication & Security
+- bcrypt
+- express-session
+- Environment variables with dotenv
+- Server-side authorization and ownership checks
 
-### Module System
+### File & Image Management
+- Multer
+- Cloudinary
 
-- ES Modules
+### Deployment & Infrastructure
+- Render
+- Neon PostgreSQL
+- Cloudinary
+
+## 🗄️ Database
+
+The application uses PostgreSQL with seven main tables:
+
+- `users`
+- `categories`
+- `posts`
+- `comments`
+- `likes`
+- `friendships`
+- `messages`
+
+The complete database structure, relationships, constraints, indexes, and schema evolution are documented in:
+
+`DATABASE_SCHEMA.md`
 
 ## 📁 Project Structure
 
+```text
 blog-capstone/
-
-├── index.js
-├── database.js
-├── package.json
-├── package-lock.json
-├── README.md
-├── blog.db
 │
 ├── public/
-│   └── styles/
-│       └── main.css
+│   ├── styles/
+│   │   └── main.css
+│   └── uploads/
 │
-└── views/
-    ├── index.ejs
-    ├── create.ejs
-    ├── post.ejs
-    ├── edit.ejs
-    │
-    └── partials/
-        ├── header.ejs
-        └── footer.ejs
+├── views/
+│   ├── partials/
+│   │   ├── footer.ejs
+│   │   └── header.ejs
+│   │
+│   ├── chat.ejs
+│   ├── create.ejs
+│   ├── edit-comment.ejs
+│   ├── edit-profile.ejs
+│   ├── edit.ejs
+│   ├── friends.ejs
+│   ├── index.ejs
+│   ├── login.ejs
+│   ├── post.ejs
+│   ├── profile.ejs
+│   └── register.ejs
+│
+├── add-friendships-table.js
+├── add-messages-table.js
+├── add-profile-columns.js
+├── database-pg.js
+├── DATABASE_SCHEMA.md
+├── index.js
+├── package-lock.json
+├── package.json
+├── .gitignore
+└── README.md
 
-## ⚙️ Installation
-### 1. Clone the repository
-
-```bash
+⚙️ Installation
+1. Clone the repository
 git clone https://github.com/kelsbaba/blog-capstone.git
-
-2. Navigate into the project
+2. Enter the project directory
 cd blog-capstone
 3. Install dependencies
 npm install
-4. Start the server
-node index.js
-5. Open the application
+4. Configure environment variables
 
-Visit:
+Create a .env file in the project root:
 
-http://localhost:3000
+DATABASE_URL=your_database_connection_string
 
-📝 How to Use
-Create a Post
-Click "Create Post".
-Enter the title.
-Enter the author name.
-Write your content.
-Click "Publish Post".
-Read a Post
+CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
+CLOUDINARY_API_KEY=your_cloudinary_api_key
+CLOUDINARY_API_SECRET=your_cloudinary_api_secret
 
-Click "Read More" on any blog post.
+SESSION_SECRET=your_session_secret
 
-Edit a Post
-Open a blog post.
-Click "Edit Post".
-Update the information.
-Click "Update Post".
+Never commit the .env file to GitHub.
 
-Delete a Post
-Open a blog post.
-Click "Delete Post".
-Confirm deletion.
-🗄️ Database
+5. Start the application
+npm start
 
-The application uses SQLite to store blog posts.
+The application will start using the command defined in package.json.
 
-Each post contains:
+🔒 Security
 
-ID
-Title
-Content
-Author
-Date
+Sensitive configuration is stored using environment variables rather than hard-coded directly into the application source code.
 
-Posts remain available after restarting
-the server.
+The .env file is excluded from version control through .gitignore.
 
-🧪 Testing
+The application also implements authentication and authorization checks for protected functionality such as post and comment ownership.
 
-The following operations have been tested:
+📚 Database Documentation
 
-Create post
-Read post
-Update post
-Delete post
-Database persistence
-Form validation
-Invalid post IDs
+For the complete PostgreSQL database structure and schema evolution history, see:
 
-All CRUD operations passed successfully.
+DATABASE_SCHEMA.md
 
-🔮 Future Improvements
-User authentication
-Comments
-Categories
-Search functionality
-Pagination
-Image uploads
-Deployment
 👨‍💻 Author
 
 Kelly Sunday Esegine
 
+Software Engineer | Java Developer | Backend & Full-Stack Developer
+
+GitHub:
+https://github.com/kelsbaba
+
 📄 License
 
-This project is licensed under the ISC License.
+ISC
