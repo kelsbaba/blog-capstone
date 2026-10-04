@@ -87,7 +87,7 @@ app.use(express.static("public"));
 // Session middleware
 app.use(
   session({
-    secret: "blog-capstone-secret",
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
   }),
