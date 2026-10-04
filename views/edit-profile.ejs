@@ -1,0 +1,94 @@
+<%- include("partials/header.ejs") %>
+
+<section class="form-section profile-edit-section">
+
+    <h1>Edit Profile</h1>
+
+    <form
+        action="/profile/edit"
+        method="POST"
+        enctype="multipart/form-data"
+    >
+
+        <div class="profile-edit-avatar">
+
+            <% if (user.profile_image) { %>
+
+                <img
+                    src="<%= user.profile_image %>"
+                    alt="<%= user.display_name || user.username %>"
+                    class="profile-edit-avatar-image"
+                >
+
+            <% } else { %>
+
+                <div class="profile-edit-avatar-placeholder">
+                    👤
+                </div>
+
+            <% } %>
+
+        </div>
+
+        <label for="image">
+            Profile Picture
+        </label>
+
+        <input
+            type="file"
+            id="image"
+            name="image"
+            accept="image/jpeg,image/png,image/gif,image/webp"
+        >
+
+        <input
+            type="hidden"
+            name="currentProfileImage"
+            value="<%= user.profile_image || '' %>"
+        >
+
+        <label for="displayName">
+            Display Name
+        </label>
+
+        <input
+            type="text"
+            id="displayName"
+            name="displayName"
+            value="<%= user.display_name || '' %>"
+            maxlength="100"
+            placeholder="Enter your display name"
+        >
+
+        <label for="bio">
+            Bio
+        </label>
+
+        <textarea
+            id="bio"
+            name="bio"
+            rows="5"
+            maxlength="500"
+            placeholder="Tell people a little about yourself..."
+        ><%= user.bio || '' %></textarea>
+
+        <div class="profile-edit-actions">
+
+            <button type="submit" class="btn">
+                Save Changes
+            </button>
+
+            <a
+                href="/profile/<%= user.id %>"
+                class="btn profile-cancel-btn"
+            >
+                Cancel
+            </a>
+
+        </div>
+
+    </form>
+
+</section>
+
+<%- include("partials/footer.ejs") %>

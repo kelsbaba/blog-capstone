@@ -47,6 +47,35 @@ body {
     text-decoration: underline;
 }
 
+/* ==========================================
+   Unread Message Badge
+   ========================================== */
+
+.friends-nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.unread-message-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: #ef4444;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.unread-message-badge.hidden {
+    display: none;
+}
+
 /* Logged-in navigation */
 
 .welcome-message {
@@ -337,77 +366,156 @@ footer {
     border-color: #3498db;
 }
 
-/* Profile */
+/* =========================
+   Profile
+   ========================= */
 
 .profile-section {
     max-width: 1000px;
     margin: 0 auto;
 }
 
+/* Profile Card */
+
 .profile-card {
     background: white;
-    padding: 40px;
-    border-radius: 12px;
+    padding: 50px 40px;
+    border-radius: 20px;
     text-align: center;
-    margin-bottom: 40px;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    margin-bottom: 50px;
+    box-shadow: 0 10px 30px rgba(44, 62, 80, 0.10);
+    border: 1px solid rgba(44, 62, 80, 0.06);
 }
 
+/* Profile Avatar */
+
 .profile-avatar {
-    width: 90px;
-    height: 90px;
-    margin: 0 auto 20px;
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 22px;
     border-radius: 50%;
-    background: #3498db;
+    overflow: hidden;
+    background: linear-gradient(135deg, #3498db, #2c3e50);
     color: white;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 42px;
+    box-shadow: 0 8px 20px rgba(52, 152, 219, 0.25);
+    border: 5px solid white;
+    outline: 2px solid #e8eef3;
 }
 
-.profile-card h1 {
-    color: #2c3e50;
-    margin-bottom: 10px;
+/* Actual uploaded profile image */
+
+.profile-avatar-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
 }
+
+/* Placeholder when no profile image exists */
+
+.profile-avatar-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 52px;
+}
+
+/* Display Name */
+
+.profile-card h1 {
+    color: #1f2937;
+    margin: 0 0 6px;
+    font-size: 34px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+/* Username */
+
+.profile-username {
+    color: #3498db;
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 18px;
+}
+
+/* Bio */
+
+.profile-bio {
+    max-width: 600px;
+    margin: 0 auto 20px;
+    color: #555;
+    font-size: 17px;
+    line-height: 1.7;
+}
+
+/* Email */
 
 .profile-email {
     color: #666;
     margin-bottom: 8px;
 }
 
+/* Member date */
+
 .profile-date {
     color: #888;
     font-size: 14px;
+    margin-top: 8px;
 }
+
+/* Profile Statistics */
 
 .profile-stats {
     display: flex;
     justify-content: center;
-    gap: 50px;
-    margin-top: 30px;
+    gap: 70px;
+    margin-top: 35px;
+    padding-top: 28px;
+    border-top: 1px solid #edf0f2;
 }
 
 .profile-stat {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 6px;
+    min-width: 90px;
 }
 
 .profile-stat strong {
-    font-size: 28px;
+    font-size: 30px;
     color: #2c3e50;
+    font-weight: 700;
 }
 
 .profile-stat span {
     color: #777;
     font-size: 14px;
+    font-weight: 500;
 }
+
+/* User Posts */
 
 .profile-posts h2 {
     color: #2c3e50;
     font-size: 30px;
     margin-bottom: 25px;
+}
+
+/* Profile post cards */
+
+.profile-posts .post-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.profile-posts .post-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(44, 62, 80, 0.12);
 }
 
 .post-meta a {
@@ -445,51 +553,106 @@ footer {
 }
 
 
-@media (max-width: 600px) {
+/* =========================
+   Edit Profile
+   ========================= */
 
-    .navbar {
-        padding: 20px;
-    }
-
-    .navbar nav {
-        flex-direction: column;
-        gap: 12px;
-    }
-
-    .navbar nav a {
-        margin: 0;
-    }
-
-    .search-form {
-        margin-left: 0;
-        width: 100%;
-        justify-content: center;
-    }
-
-    .search-form input {
-        width: 200px;
-    }
-
-    .hero h1 {
-        font-size: 30px;
-    }
-
-    .single-post {
-        padding: 25px;
-    }
-
-        .profile-card {
-        padding: 25px;
-    }
-
-    .profile-stats {
-        gap: 30px;
-    }
-
-    .profile-stat strong {
-        font-size: 24px;
-    }
+.profile-edit-section {
+    max-width: 700px;
+    margin: 0 auto;
+    background: white;
+    padding: 45px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(44, 62, 80, 0.10);
+    border: 1px solid rgba(44, 62, 80, 0.06);
 }
+
+.profile-edit-section h1 {
+    text-align: center;
+    color: #1f2937;
+    font-size: 32px;
+    margin: 0 0 35px;
+}
+
+/* Edit Profile Avatar */
+
+.profile-edit-avatar {
+    width: 130px;
+    height: 130px;
+    margin: 0 auto 30px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: linear-gradient(135deg, #3498db, #2c3e50);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 20px rgba(52, 152, 219, 0.20);
+    border: 5px solid white;
+    outline: 2px solid #e8eef3;
+}
+
+.profile-edit-avatar-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.profile-edit-avatar-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 55px;
+}
+
+/* File input */
+
+.profile-edit-section input[type="file"] {
+    padding: 10px;
+    background: #f8fafc;
+    cursor: pointer;
+}
+
+/* Form fields */
+
+.profile-edit-section input[type="text"],
+.profile-edit-section textarea {
+    background: #fafbfc;
+    border: 1px solid #dfe5ea;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.profile-edit-section input[type="text"]:focus,
+.profile-edit-section textarea:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.12);
+    outline: none;
+}
+
+/* Action buttons */
+
+.profile-edit-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.profile-edit-actions .btn {
+    margin-top: 0;
+}
+
+.profile-cancel-btn {
+    background: #6b7280;
+}
+
+.profile-cancel-btn:hover {
+    background: #4b5563;
+}
+
 
 /* Comment Actions */
 
@@ -581,4 +744,631 @@ footer {
     height: 200px;
     object-fit: cover;
     border-radius: 8px;
+}
+
+/* =========================
+   Friends
+   ========================= */
+
+.friends-section {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.friends-header {
+    margin-bottom: 30px;
+}
+
+.friends-header h1 {
+    color: #2c3e50;
+    font-size: 36px;
+    margin-bottom: 8px;
+}
+
+.friends-header p {
+    color: #666;
+    font-size: 16px;
+}
+
+.friends-panel {
+    background: white;
+    padding: 30px;
+    border-radius: 16px;
+    margin-bottom: 30px;
+    box-shadow: 0 6px 20px rgba(44, 62, 80, 0.08);
+}
+
+.friends-panel h2 {
+    color: #2c3e50;
+    font-size: 24px;
+    margin: 0 0 20px;
+}
+
+.friend-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.friend-card {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px 15px;
+    background: #f8fafc;
+    border: 1px solid #e5e9ed;
+    border-radius: 12px;
+    min-height: 76px;
+}
+
+.friend-avatar {
+    width: 55px;
+    height: 55px;
+    min-width: 55px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #3498db;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
+.friend-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.friend-avatar span {
+    font-size: 26px;
+}
+
+.friend-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.friend-info h3 {
+    margin: 0 0 4px;
+    color: #2c3e50;
+    font-size: 17px;
+}
+
+.friend-info p {
+    margin: 0;
+    color: #777;
+    font-size: 14px;
+}
+
+.friend-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.friend-actions form {
+    margin: 0;
+}
+
+.friend-actions .btn {
+    margin-top: 0;
+    padding: 8px 14px;
+    font-size: 14px;
+}
+
+.friend-accept-btn {
+    background: #3498db;
+}
+
+.friend-reject-btn {
+    background: #e74c3c;
+}
+
+.friend-reject-btn:hover {
+    background: #c0392b;
+}
+
+.friend-view-btn {
+    margin-top: 0;
+    padding: 8px 14px;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.empty-message {
+    color: #777;
+    margin: 0;
+}
+
+/* Friend online/offline presence */
+
+.friend-presence {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 5px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.presence-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.friend-presence.online {
+    color: #16a34a;
+}
+
+.friend-presence.online .presence-dot {
+    background: #16a34a;
+}
+
+.friend-presence.offline {
+    color: #64748b;
+}
+
+.friend-presence.offline .presence-dot {
+    background: #94a3b8;
+}
+
+/* Clickable Friend Identity */
+
+.friend-identity-link {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex: 1;
+    min-width: 0;
+    color: inherit;
+    text-decoration: none;
+    border-radius: 10px;
+}
+
+.friend-identity-link:hover {
+    text-decoration: none;
+}
+
+.friend-identity-link .friend-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.friend-identity-link .friend-avatar {
+    flex-shrink: 0;
+}
+
+/* ==========================================
+   Per-Friend Unread Message Badge
+   ========================================== */
+
+.friend-name-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+}
+
+.friend-unread-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: #ef4444;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.friend-unread-badge.hidden {
+    display: none;
+}
+
+/* =========================
+   Private Chat
+   ========================= */
+
+.chat-page {
+    width: 100%;
+    padding: 30px 15px;
+}
+
+.chat-container {
+    max-width: 800px;
+    height: 700px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    background: #ffffff;
+    border: 1px solid #e5e9ed;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+}
+
+
+/* Chat Header */
+
+.chat-header {
+    padding: 15px 20px;
+    border-bottom: 1px solid #e5e9ed;
+    background: #f8fafc;
+}
+
+.chat-back {
+    display: inline-block;
+    margin-bottom: 12px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.chat-user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.chat-avatar {
+    width: 50px;
+    height: 50px;
+    min-width: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.chat-avatar-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e2e8f0;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.chat-user-info h1 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.chat-user-info p {
+    margin: 3px 0 0;
+    color: #64748b;
+    font-size: 13px;
+}
+
+
+/* Messages Area */
+
+.chat-messages {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background: #ffffff;
+}
+
+.chat-empty {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #64748b;
+    text-align: center;
+}
+
+.chat-empty p {
+    margin: 4px 0;
+}
+
+
+/* Message Rows */
+
+.message-row {
+    display: flex;
+    margin-bottom: 12px;
+}
+
+.message-row.sent {
+    justify-content: flex-end;
+}
+
+.message-row.received {
+    justify-content: flex-start;
+}
+
+
+/* Message Bubble */
+
+.message-bubble {
+    max-width: 70%;
+    padding: 10px 14px;
+    border-radius: 14px;
+}
+
+.message-row.sent .message-bubble {
+    background: #2563eb;
+    color: #ffffff;
+    border-bottom-right-radius: 4px;
+}
+
+.message-row.received .message-bubble {
+    background: #f1f5f9;
+    color: #1e293b;
+    border-bottom-left-radius: 4px;
+}
+
+.message-bubble p {
+    margin: 0;
+    line-height: 1.5;
+    word-wrap: break-word;
+}
+
+.message-time {
+    display: block;
+    margin-top: 5px;
+    font-size: 10px;
+    opacity: 0.7;
+}
+
+
+/* Message Form */
+
+.chat-form {
+    display: flex;
+    gap: 10px;
+    padding: 15px;
+    border-top: 1px solid #e5e9ed;
+    background: #f8fafc;
+}
+
+.chat-form input {
+    flex: 1;
+    min-width: 0;
+    padding: 11px 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    outline: none;
+    font-size: 14px;
+}
+
+.chat-form input:focus {
+    border-color: #2563eb;
+}
+
+.chat-form button {
+    flex-shrink: 0;
+}
+
+
+/* Mobile */
+
+@media (max-width: 600px) {
+
+    .chat-page {
+        padding: 10px 0;
+    }
+
+    .chat-container {
+        width: 100%;
+        height: calc(100vh - 100px);
+        min-height: 500px;
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+    }
+
+    .chat-header {
+        padding: 12px 15px;
+    }
+
+    .chat-messages {
+        padding: 15px 10px;
+    }
+
+    .message-bubble {
+        max-width: 82%;
+    }
+
+    .chat-form {
+        padding: 10px;
+    }
+
+    .chat-form input {
+        padding: 10px;
+    }
+
+    .chat-form button {
+        padding: 9px 13px;
+    }
+}
+
+
+/* Chat Online / Offline Presence */
+
+.chat-presence {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 5px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.chat-presence.online {
+    color: #16a34a;
+}
+
+.chat-presence.online .presence-dot {
+    background: #16a34a;
+}
+
+.chat-presence.offline {
+    color: #64748b;
+}
+
+.chat-presence.offline .presence-dot {
+    background: #94a3b8;
+}
+
+.chat-user-status {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 5px;
+}
+
+.chat-profile-link {
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.chat-profile-link:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 600px) {
+
+    .navbar {
+        padding: 20px;
+    }
+
+    .navbar nav {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .navbar nav a {
+        margin: 0;
+    }
+
+    .search-form {
+        margin-left: 0;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .search-form input {
+        width: 200px;
+    }
+
+    .hero h1 {
+        font-size: 30px;
+    }
+
+    .single-post {
+        padding: 25px;
+    }
+
+        .profile-card {
+        padding: 25px;
+    }
+
+    .profile-stats {
+        gap: 30px;
+    }
+
+    .profile-stat strong {
+        font-size: 24px;
+    }
+
+    .profile-edit-section {
+    padding: 30px 20px;
+}
+
+.profile-edit-section h1 {
+    font-size: 28px;
+}
+
+.profile-edit-actions {
+    flex-direction: column;
+}
+
+.profile-edit-actions .btn {
+    width: 100%;
+    text-align: center;
+}
+
+/* Friends mobile layout */
+
+.friends-section {
+    width: 100%;
+}
+
+.friends-panel {
+    padding: 20px 15px;
+}
+
+.friends-header h1 {
+    font-size: 30px;
+}
+
+.friend-card {
+    padding: 10px;
+    gap: 10px;
+}
+
+.friend-avatar {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+}
+
+.friend-info h3 {
+    font-size: 15px;
+}
+
+.friend-info p {
+    font-size: 13px;
+}
+
+.friend-view-btn {
+    padding: 7px 10px;
+    font-size: 12px;
+}
+
+.friend-actions {
+    gap: 5px;
+}
+
+.friend-actions .btn {
+    padding: 7px 9px;
+    font-size: 12px;
+}
+
+    .chat-user-info h1 {
+        font-size: 18px;
+    }
+
+    .chat-user-info p {
+        font-size: 12px;
+    }
+
+    .chat-presence {
+        font-size: 11px;
+    }
+
+    .friend-identity-link {
+    gap: 10px;
+}
+
+.chat-user-status {
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.chat-profile-link {
+    font-size: 11px;
+}
+
 }

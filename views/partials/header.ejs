@@ -26,7 +26,12 @@
             <a href="/create">Create Post</a>
 
             <% if (currentUser) { %>
-
+            <a href="/friends" class="friends-nav-link">
+                Friends
+                <span id="unread-message-badge" class="unread-message-badge hidden">
+                    0
+                </span>
+            </a>
                 <span class="welcome-message">
                     Welcome, <%= currentUser.username %> 👋
                 </span>

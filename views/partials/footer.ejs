@@ -1,10 +1,596 @@
-    </main>
+</main>
 
-    <footer>
+<footer>
 
-        <p>© <%= new Date().getFullYear() %> My Blog. Built with Express and EJS.</p>
+    <p>© <%= new Date().getFullYear() %> My Blog. Built with Express and EJS.</p>
 
-    </footer>
+</footer>
+
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+
+    // ==========================================
+    // Current User / Current Chat
+    // ==========================================
+
+    const currentUserId =
+        "<%= currentUser ? currentUser.id : '' %>";
+
+    const currentChatUserId =
+        Number(
+            "<%= typeof otherUser !== 'undefined' ? otherUser.id : '' %>"
+        );
+
+
+    // ==========================================
+    // Socket.IO Connection
+    // ==========================================
+
+    const socket = io();
+
+
+    socket.on("connect", () => {
+
+        console.log(
+            "Connected to Socket.IO:",
+            socket.id
+        );
+
+
+        // Register this user as online
+        if (currentUserId) {
+
+            socket.emit(
+                "user-online",
+                Number(currentUserId)
+            );
+
+        }
+
+
+        // If this is a chat page,
+        // mark the currently open conversation as read
+        if (
+            currentUserId &&
+            currentChatUserId
+        ) {
+
+            socket.emit(
+                "mark-messages-read",
+                {
+                    userId: Number(currentUserId),
+                    otherUserId: currentChatUserId
+                }
+            );
+
+        }
+
+    });
+
+
+    socket.on("disconnect", () => {
+
+        console.log(
+            "Disconnected from Socket.IO"
+        );
+
+    });
+
+
+    // ==========================================
+    // Friend Online / Offline Presence
+    // ==========================================
+
+    socket.on(
+        "online-users",
+        (onlineUserIds) => {
+
+            onlineUserIds.forEach(
+                (userId) => {
+
+                    updateFriendPresence(
+                        userId,
+                        true
+                    );
+
+                }
+            );
+
+        }
+    );
+
+
+    socket.on(
+        "presence-update",
+        ({ userId, online }) => {
+
+            updateFriendPresence(
+                userId,
+                online
+            );
+
+        }
+    );
+
+
+    function updateFriendPresence(
+        userId,
+        online
+    ) {
+
+        const presenceElements =
+            document.querySelectorAll(
+                `.friend-presence[data-user-id="${userId}"],
+                 .chat-presence[data-user-id="${userId}"]`
+            );
+
+
+        if (!presenceElements.length) {
+            return;
+        }
+
+
+        presenceElements.forEach(
+            (presenceElement) => {
+
+                if (online) {
+
+                    presenceElement.classList.remove(
+                        "offline"
+                    );
+
+                    presenceElement.classList.add(
+                        "online"
+                    );
+
+                    presenceElement.innerHTML =
+                        '<span class="presence-dot"></span> Online';
+
+                } else {
+
+                    presenceElement.classList.remove(
+                        "online"
+                    );
+
+                    presenceElement.classList.add(
+                        "offline"
+                    );
+
+                    presenceElement.innerHTML =
+                        '<span class="presence-dot"></span> Offline';
+
+                }
+
+            }
+        );
+
+    }
+
+
+    // ==========================================
+    // Real-Time Private Messaging
+    // ==========================================
+
+    const chatForm =
+        document.getElementById(
+            "chat-form"
+        );
+
+    const chatInput =
+        document.getElementById(
+            "chat-input"
+        );
+
+
+    if (
+        chatForm &&
+        chatInput
+    ) {
+
+        chatForm.addEventListener(
+            "submit",
+            (event) => {
+
+                event.preventDefault();
+
+
+                const content =
+                    chatInput.value.trim();
+
+
+                if (!content) {
+                    return;
+                }
+
+
+                const receiverId =
+                    Number(
+                        "<%= typeof otherUser !== 'undefined' ? otherUser.id : '' %>"
+                    );
+
+
+                if (!receiverId) {
+                    return;
+                }
+
+
+                socket.emit(
+                    "private-message",
+                    {
+                        senderId:
+                            Number(currentUserId),
+
+                        receiverId:
+                            receiverId,
+
+                        content:
+                            content
+                    }
+                );
+
+
+                chatInput.value = "";
+
+                chatInput.focus();
+
+            }
+        );
+
+    }
+
+
+    // ==========================================
+    // Display Real-Time Private Messages
+    // ==========================================
+
+    function addMessageToChat(message) {
+
+        const chatMessages =
+            document.querySelector(
+                ".chat-messages"
+            );
+
+
+        if (!chatMessages) {
+            return;
+        }
+
+
+        // Remove empty conversation message
+        const emptyMessage =
+            chatMessages.querySelector(
+                ".chat-empty"
+            );
+
+
+        if (emptyMessage) {
+            emptyMessage.remove();
+        }
+
+
+        const messageRow =
+            document.createElement(
+                "div"
+            );
+
+        messageRow.classList.add(
+            "message-row"
+        );
+
+
+        if (
+            Number(message.sender_id) ===
+            Number(currentUserId)
+        ) {
+
+            messageRow.classList.add(
+                "sent"
+            );
+
+        } else {
+
+            messageRow.classList.add(
+                "received"
+            );
+
+        }
+
+
+        const messageBubble =
+            document.createElement(
+                "div"
+            );
+
+        messageBubble.classList.add(
+            "message-bubble"
+        );
+
+
+        const messageContent =
+            document.createElement(
+                "p"
+            );
+
+        messageContent.textContent =
+            message.content;
+
+
+        const messageTime =
+            document.createElement(
+                "span"
+            );
+
+        messageTime.classList.add(
+            "message-time"
+        );
+
+        messageTime.textContent =
+            new Date(
+                message.created_at
+            ).toLocaleString();
+
+
+        messageBubble.appendChild(
+            messageContent
+        );
+
+        messageBubble.appendChild(
+            messageTime
+        );
+
+        messageRow.appendChild(
+            messageBubble
+        );
+
+        chatMessages.appendChild(
+            messageRow
+        );
+
+
+        // Scroll to newest message
+        chatMessages.scrollTop =
+            chatMessages.scrollHeight;
+
+    }
+
+
+    // ==========================================
+    // Message Sent
+    // ==========================================
+
+    socket.on(
+        "message-sent",
+        (message) => {
+
+            addMessageToChat(
+                message
+            );
+
+        }
+    );
+
+
+    // ==========================================
+    // Message Received
+    // ==========================================
+
+    socket.on(
+        "message-received",
+        (message) => {
+
+            addMessageToChat(
+                message
+            );
+
+
+            // If the current page is already
+            // this conversation, immediately
+            // mark the message as read.
+            if (
+                currentChatUserId &&
+                Number(message.sender_id) ===
+                    currentChatUserId
+            ) {
+
+                socket.emit(
+                    "mark-messages-read",
+                    {
+                        userId:
+                            Number(currentUserId),
+
+                        otherUserId:
+                            currentChatUserId
+                    }
+                );
+
+            }
+
+        }
+    );
+
+
+    // ==========================================
+    // Global Unread Message Badge
+    // ==========================================
+
+    async function updateUnreadMessageBadge() {
+
+        const badge =
+            document.getElementById(
+                "unread-message-badge"
+            );
+
+
+        if (!badge) {
+            return;
+        }
+
+
+        try {
+
+            const response =
+                await fetch(
+                    "/messages/unread-count"
+                );
+
+
+            if (!response.ok) {
+                return;
+            }
+
+
+            const data =
+                await response.json();
+
+
+            if (data.count > 0) {
+
+                badge.textContent =
+                    data.count;
+
+                badge.classList.remove(
+                    "hidden"
+                );
+
+            } else {
+
+                badge.textContent =
+                    "0";
+
+                badge.classList.add(
+                    "hidden"
+                );
+
+            }
+
+        } catch (error) {
+
+            console.error(
+                "Error loading unread message count:",
+                error
+            );
+
+        }
+
+    }
+
+
+    // ==========================================
+    // Per-Friend Unread Message Badges
+    // ==========================================
+
+    async function updateFriendUnreadBadges() {
+
+        const badges =
+            document.querySelectorAll(
+                ".friend-unread-badge"
+            );
+
+
+        if (!badges.length) {
+            return;
+        }
+
+
+        try {
+
+            const response =
+                await fetch(
+                    "/messages/unread-by-sender"
+                );
+
+
+            if (!response.ok) {
+                return;
+            }
+
+
+            const unreadCounts =
+                await response.json();
+
+
+            // Reset all friend badges
+            badges.forEach(
+                (badge) => {
+
+                    badge.textContent =
+                        "0";
+
+                    badge.classList.add(
+                        "hidden"
+                    );
+
+                }
+            );
+
+
+            // Apply unread counts
+            unreadCounts.forEach(
+                ({ sender_id, count }) => {
+
+                    const badge =
+                        document.querySelector(
+                            `.friend-unread-badge[data-unread-user-id="${sender_id}"]`
+                        );
+
+
+                    if (!badge) {
+                        return;
+                    }
+
+
+                    if (count > 0) {
+
+                        badge.textContent =
+                            count;
+
+                        badge.classList.remove(
+                            "hidden"
+                        );
+
+                    }
+
+                }
+            );
+
+        } catch (error) {
+
+            console.error(
+                "Error loading friend unread message counts:",
+                error
+            );
+
+        }
+
+    }
+
+
+    // ==========================================
+    // Unread Message Update
+    // ==========================================
+
+    socket.on(
+        "unread-message-update",
+        () => {
+
+            updateUnreadMessageBadge();
+
+            updateFriendUnreadBadges();
+
+        }
+    );
+
+
+    // ==========================================
+    // Initial Badge Load
+    // ==========================================
+
+    updateUnreadMessageBadge();
+
+    updateFriendUnreadBadges();
+
+</script>
 
 </body>
 

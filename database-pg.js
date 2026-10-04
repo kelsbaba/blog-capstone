@@ -77,6 +77,65 @@ export async function getUserByEmail(email) {
 }
 
 // =========================
+// User Profile Queries
+// =========================
+
+export async function getUserById(userId) {
+    const result = await pool.query(
+        `
+        SELECT
+            id,
+            username,
+            email,
+            display_name,
+            bio,
+            profile_image,
+            created_at
+        FROM users
+        WHERE id = $1
+        `,
+        [userId]
+    );
+
+    return result.rows[0];
+}
+
+export async function updateUserProfile(
+    userId,
+    displayName,
+    bio,
+    profileImage
+) {
+    const result = await pool.query(
+        `
+        UPDATE users
+        SET
+            display_name = $1,
+            bio = $2,
+            profile_image = $3
+        WHERE id = $4
+        RETURNING
+            id,
+            username,
+            email,
+            display_name,
+            bio,
+            profile_image,
+            created_at
+        `,
+        [
+            displayName,
+            bio,
+            profileImage,
+            userId
+        ]
+    );
+
+    return result.rows[0];
+}
+
+
+// =========================
 // Category Queries
 // =========================
 
@@ -574,6 +633,9 @@ export async function getUserProfile(userId) {
             users.id,
             users.username,
             users.email,
+            users.display_name,
+            users.bio,
+            users.profile_image,
             users.created_at,
             COUNT(DISTINCT posts.id) AS post_count,
             COUNT(DISTINCT comments.id) AS comment_count
@@ -609,5 +671,243 @@ export async function getUserPosts(userId) {
     return result.rows;
 }
 
+// =========================
+// Friendship Queries
+// =========================
+
+export async function sendFriendRequest(senderId, receiverId) {
+    const result = await pool.query(
+        `
+        INSERT INTO friendships (
+            sender_id,
+            receiver_id
+        )
+        VALUES ($1, $2)
+        RETURNING *
+        `,
+        [
+            senderId,
+            receiverId
+        ]
+    );
+
+    return result.rows[0];
+}
+
+export async function getFriendStatus(userId, otherUserId) {
+    const result = await pool.query(
+        `
+        SELECT *
+        FROM friendships
+        WHERE
+            (sender_id = $1 AND receiver_id = $2)
+            OR
+            (sender_id = $2 AND receiver_id = $1)
+        ORDER BY id DESC
+        LIMIT 1
+        `,
+        [
+            userId,
+            otherUserId
+        ]
+    );
+
+    return result.rows[0];
+}
+
+export async function getPendingFriendRequests(userId) {
+    const result = await pool.query(
+        `
+        SELECT
+            friendships.*,
+            users.username,
+            users.display_name,
+            users.profile_image
+        FROM friendships
+        JOIN users
+            ON friendships.sender_id = users.id
+        WHERE
+            friendships.receiver_id = $1
+            AND friendships.status = 'pending'
+        ORDER BY friendships.created_at DESC
+        `,
+        [userId]
+    );
+
+    return result.rows;
+}
+
+export async function acceptFriendRequest(requestId, userId) {
+    const result = await pool.query(
+        `
+        UPDATE friendships
+        SET status = 'accepted'
+        WHERE
+            id = $1
+            AND receiver_id = $2
+            AND status = 'pending'
+        RETURNING *
+        `,
+        [
+            requestId,
+            userId
+        ]
+    );
+
+    return result.rows[0];
+}
+
+export async function rejectFriendRequest(requestId, userId) {
+    const result = await pool.query(
+        `
+        UPDATE friendships
+        SET status = 'rejected'
+        WHERE
+            id = $1
+            AND receiver_id = $2
+            AND status = 'pending'
+        RETURNING *
+        `,
+        [
+            requestId,
+            userId
+        ]
+    );
+
+    return result.rows[0];
+}
+
+export async function getFriends(userId) {
+    const result = await pool.query(
+        `
+        SELECT
+            users.id,
+            users.username,
+            users.display_name,
+            users.profile_image,
+            friendships.created_at
+        FROM friendships
+        JOIN users
+            ON users.id =
+                CASE
+                    WHEN friendships.sender_id = $1
+                        THEN friendships.receiver_id
+                    ELSE friendships.sender_id
+                END
+        WHERE
+            (
+                friendships.sender_id = $1
+                OR friendships.receiver_id = $1
+            )
+            AND friendships.status = 'accepted'
+        ORDER BY friendships.created_at DESC
+        `,
+        [userId]
+    );
+
+    return result.rows;
+}
+
+// ===============================
+// MESSAGE FUNCTIONS
+// ===============================
+
+// Save a new message
+export async function createMessage(senderId, receiverId, content) {
+    const result = await pool.query(
+        `
+        INSERT INTO messages (sender_id, receiver_id, content)
+        VALUES ($1, $2, $3)
+        RETURNING *;
+        `,
+        [senderId, receiverId, content]
+    );
+
+    return result.rows[0];
+}
+
+
+// Get conversation history between two users
+export async function getConversation(userId, otherUserId) {
+    const result = await pool.query(
+        `
+        SELECT
+            m.id,
+            m.sender_id,
+            m.receiver_id,
+            m.content,
+            m.created_at,
+            m.read_at,
+            sender.username AS sender_username,
+            sender.display_name AS sender_display_name,
+            receiver.username AS receiver_username,
+            receiver.display_name AS receiver_display_name
+        FROM messages m
+        JOIN users sender
+            ON sender.id = m.sender_id
+        JOIN users receiver
+            ON receiver.id = m.receiver_id
+        WHERE
+            (m.sender_id = $1 AND m.receiver_id = $2)
+            OR
+            (m.sender_id = $2 AND m.receiver_id = $1)
+        ORDER BY m.created_at ASC, m.id ASC;
+        `,
+        [userId, otherUserId]
+    );
+
+    return result.rows;
+}
+
+
+// Get the number of unread messages for a user
+export async function getUnreadMessageCount(userId) {
+    const result = await pool.query(
+        `
+        SELECT COUNT(*)::int AS count
+        FROM messages
+        WHERE receiver_id = $1
+          AND read_at IS NULL;
+        `,
+        [userId]
+    );
+
+    return result.rows[0].count;
+}
+
+export async function getUnreadMessageCountsBySender(userId) {
+    const result = await pool.query(
+        `
+        SELECT
+            sender_id,
+            COUNT(*)::int AS count
+        FROM messages
+        WHERE receiver_id = $1
+          AND read_at IS NULL
+        GROUP BY sender_id;
+        `,
+        [userId]
+    );
+
+    return result.rows;
+}
+
+
+// Mark messages from another user as read
+export async function markMessagesAsRead(userId, otherUserId) {
+    const result = await pool.query(
+        `
+        UPDATE messages
+        SET read_at = CURRENT_TIMESTAMP
+        WHERE receiver_id = $1
+          AND sender_id = $2
+          AND read_at IS NULL
+        RETURNING *;
+        `,
+        [userId, otherUserId]
+    );
+
+    return result.rows;
+}
 
 export default pool;

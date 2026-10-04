@@ -2,44 +2,156 @@
 
 <section class="profile-section">
 
-    <div class="profile-card">
+  <div class="profile-card">
 
-        <div class="profile-avatar">
-            👤
-        </div>
+    <div class="profile-avatar">
+        <% if (profile.profile_image) { %>
 
-        <h1>
-            <%= profile.username %>
-        </h1>
+            <img
+                src="<%= profile.profile_image %>"
+                alt="<%= profile.display_name || profile.username %>"
+                class="profile-avatar-image"
+            >
 
-        <p class="profile-email">
-            <%= profile.email %>
+        <% } else { %>
+
+            <div class="profile-avatar-placeholder">
+                👤
+            </div>
+
+        <% } %>
+    </div>
+
+    <h1>
+        <%= profile.display_name || profile.username %>
+    </h1>
+
+    <p class="profile-username">
+        @<%= profile.username %>
+    </p>
+
+    <% if (profile.bio) { %>
+
+        <p class="profile-bio">
+            <%= profile.bio %>
         </p>
 
-       <p class="profile-date">
-    Member since:
-    <%= new Date(profile.created_at).toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric"
-    }) %>
-</p>
+    <% } %>
 
-        <div class="profile-stats">
+    <p class="profile-email">
+        <%= profile.email %>
+    </p>
 
-            <div class="profile-stat">
-                <strong><%= profile.post_count %></strong>
-                <span>Posts</span>
-            </div>
+    <p class="profile-date">
+        Member since:
+        <%= new Date(profile.created_at).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric"
+        }) %>
+    </p>
 
-            <div class="profile-stat">
-                <strong><%= profile.comment_count %></strong>
-                <span>Comments</span>
-            </div>
+    <div class="profile-stats">
 
+        <div class="profile-stat">
+            <strong><%= profile.post_count %></strong>
+            <span>Posts</span>
+        </div>
+
+        <div class="profile-stat">
+            <strong><%= profile.comment_count %></strong>
+            <span>Comments</span>
         </div>
 
     </div>
+
+    <% if (currentUser && currentUser.id === profile.id) { %>
+
+    <div class="profile-actions">
+
+        <a
+            href="/profile/edit"
+            class="btn"
+        >
+            Edit Profile
+        </a>
+
+    </div>
+
+<% } %>
+
+<% if (currentUser && currentUser.id !== profile.id) { %>
+
+    <div class="profile-actions">
+
+        <% if (!friendStatus) { %>
+
+            <form
+                action="/friends/request/<%= profile.id %>"
+                method="POST"
+            >
+                <button
+                    type="submit"
+                    class="btn"
+                >
+                    Add Friend
+                </button>
+            </form>
+
+        <% } else if (friendStatus.status === "pending") { %>
+
+            <% if (friendStatus.sender_id === currentUser.id) { %>
+
+                <button
+                    type="button"
+                    class="btn"
+                    disabled
+                >
+                    Request Sent
+                </button>
+
+            <% } else { %>
+
+                <a
+                    href="/friends"
+                    class="btn"
+                >
+                    Respond to Request
+                </a>
+
+            <% } %>
+
+        <% } else if (friendStatus.status === "accepted") { %>
+
+            <button
+                type="button"
+                class="btn"
+                disabled
+            >
+                Friends
+            </button>
+
+        <% } else if (friendStatus.status === "rejected") { %>
+
+            <form
+                action="/friends/request/<%= profile.id %>"
+                method="POST"
+            >
+                <button
+                    type="submit"
+                    class="btn"
+                >
+                    Add Friend
+                </button>
+            </form>
+
+        <% } %>
+
+    </div>
+
+<% } %>
+
+</div>
 
 
     <div class="profile-posts">
@@ -61,6 +173,17 @@
                 <% posts.forEach(post => { %>
 
                     <article class="post-card">
+
+                        <% if (post.image) { %>
+                            <div class="post-card-image">
+                                <img 
+                                src="<%= post.image %>"
+                                alt="<%= post.title %>"
+                                >
+
+                            </div>
+                            
+                       <% } %>
 
                         <h3>
                             <%= post.title %>

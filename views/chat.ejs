@@ -1,0 +1,134 @@
+<%- include("partials/header.ejs") %>
+
+<main class="chat-page">
+
+    <section class="chat-container">
+
+        <!-- Chat Header -->
+        <div class="chat-header">
+
+            <a href="/friends" class="chat-back">
+                ← Friends
+            </a>
+
+            <div class="chat-user">
+
+                <% if (otherUser.profile_image) { %>
+
+                    <img
+                        src="<%= otherUser.profile_image %>"
+                        alt="<%= otherUser.display_name || otherUser.username %>"
+                        class="chat-avatar"
+                    >
+
+                <% } else { %>
+
+                    <div class="chat-avatar chat-avatar-fallback">
+                        <%= (otherUser.display_name || otherUser.username)
+                            .charAt(0)
+                            .toUpperCase() %>
+                    </div>
+
+                <% } %>
+
+    <div class="chat-user-info">
+
+        <h1>
+            <%= otherUser.display_name || otherUser.username %>
+        </h1>
+
+        <p>
+            @<%= otherUser.username %>
+        </p>
+
+        <div class="chat-user-status">
+
+            <span
+                class="chat-presence offline"
+                data-user-id="<%= otherUser.id %>"
+            >
+                <span class="presence-dot"></span>
+                Offline
+            </span>
+
+            <a
+                href="/profile/<%= otherUser.id %>"
+                class="chat-profile-link"
+            >
+                View Profile
+            </a>
+
+        </div>
+
+    </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Messages -->
+        <div class="chat-messages">
+
+            <% if (messages.length === 0) { %>
+
+                <div class="chat-empty">
+                    <p>No messages yet.</p>
+                    <p>Start the conversation!</p>
+                </div>
+
+            <% } else { %>
+
+                <% messages.forEach(message => { %>
+
+                    <div
+                        class="message-row <%= message.sender_id === currentUser.id ? 'sent' : 'received' %>"
+                    >
+
+                        <div class="message-bubble">
+
+                            <p>
+                                <%= message.content %>
+                            </p>
+
+                            <span class="message-time">
+                                <%= new Date(message.created_at).toLocaleString() %>
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                <% }) %>
+
+            <% } %>
+
+        </div>
+
+
+        <!-- Message Form -->
+        <form
+            id="chat-form"
+            class="chat-form"
+        >
+
+            <input
+                type="text"
+                id="chat-input"
+                name="content"
+                placeholder="Type a message..."
+                autocomplete="off"
+                required
+            >
+
+            <button type="submit" class="btn">
+                Send
+            </button>
+
+        </form>
+
+    </section>
+
+</main>
+
+<%- include("partials/footer.ejs") %>

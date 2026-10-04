@@ -1,0 +1,186 @@
+<%- include("partials/header.ejs") %>
+
+<section class="friends-section">
+
+    <div class="friends-header">
+        <h1>Friends</h1>
+        <p>Manage your friends and friend requests.</p>
+    </div>
+
+
+    <!-- Friend Requests -->
+
+    <div class="friends-panel">
+
+        <h2>Friend Requests</h2>
+
+        <% if (friendRequests.length === 0) { %>
+
+            <p class="empty-message">
+                You don't have any pending friend requests.
+            </p>
+
+        <% } else { %>
+
+            <div class="friend-list">
+
+                <% friendRequests.forEach(request => { %>
+
+                    <div class="friend-card">
+
+                        <div class="friend-avatar">
+
+                            <% if (request.profile_image) { %>
+
+                                <img
+                                    src="<%= request.profile_image %>"
+                                    alt="<%= request.display_name || request.username %>"
+                                >
+
+                            <% } else { %>
+
+                                <span>👤</span>
+
+                            <% } %>
+
+                        </div>
+
+                        <div class="friend-info">
+
+                            <h3>
+                                <%= request.display_name || request.username %>
+                            </h3>
+
+                            <p>
+                                @<%= request.username %>
+                            </p>
+
+                        </div>
+
+                        <div class="friend-actions">
+
+                            <form
+                                action="/friends/accept/<%= request.id %>"
+                                method="POST"
+                            >
+                                <button
+                                    type="submit"
+                                    class="btn friend-accept-btn"
+                                >
+                                    Accept
+                                </button>
+                            </form>
+
+                            <form
+                                action="/friends/reject/<%= request.id %>"
+                                method="POST"
+                            >
+                                <button
+                                    type="submit"
+                                    class="btn friend-reject-btn"
+                                >
+                                    Reject
+                                </button>
+                            </form>
+
+                        </div>
+
+                    </div>
+
+                <% }) %>
+
+            </div>
+
+        <% } %>
+
+    </div>
+
+
+    <!-- Friends List -->
+
+    <div class="friends-panel">
+
+        <h2>Your Friends</h2>
+
+        <% if (friends.length === 0) { %>
+
+            <p class="empty-message">
+                You don't have any friends yet.
+            </p>
+
+        <% } else { %>
+
+            <div class="friend-list">
+
+                <% friends.forEach(friend => { %>
+
+                    <div class="friend-card">
+
+                        <!-- Clickable Friend Identity -->
+
+                        <a
+                            href="/chat/<%= friend.id %>"
+                            class="friend-identity-link"
+                        >
+
+                            <div class="friend-avatar">
+
+                                <% if (friend.profile_image) { %>
+
+                                    <img
+                                        src="<%= friend.profile_image %>"
+                                        alt="<%= friend.display_name || friend.username %>"
+                                    >
+
+                                <% } else { %>
+
+                                    <span>👤</span>
+
+                                <% } %>
+
+                            </div>
+
+             <div class="friend-info">
+
+                 <h3 class="friend-name-row">
+                    <span>
+                        <%= friend.display_name || friend.username %>
+                    </span>
+
+                    <span
+                        class="friend-unread-badge hidden"
+                        data-unread-user-id="<%= friend.id %>"
+                    >
+                        0
+                    </span>
+                 </h3>
+
+                                <p>
+                                    @<%= friend.username %>
+                                </p>
+
+                                <span
+                                    class="friend-presence offline"
+                                    data-user-id="<%= friend.id %>"
+                                >
+                                    <span class="presence-dot"></span>
+                                    Offline
+                                </span>
+
+                            </div>
+
+                        </a>
+
+                    </div>
+
+                <% }) %>
+
+            </div>
+
+        <% } %>
+
+    </div>
+
+</section>
+
+<%- include("partials/footer.ejs") %>
