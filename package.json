@@ -1,13 +1,24 @@
 {
   "name": "blog-capstone",
   "version": "1.0.0",
-  "description": "",
+  "description": "A full-stack social blogging platform built with Node.js, Express.js, PostgreSQL, EJS, Cloudinary and Socket.IO.",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
+  "keywords": [
+    "blog",
+    "nodejs",
+    "express",
+    "postgresql",
+    "ejs",
+    "javascript",
+    "socket.io",
+    "cloudinary",
+    "full-stack",
+    "web-application"
+  ],
   "author": "Kelly Sunday Esegine",
   "license": "ISC",
   "type": "module",
