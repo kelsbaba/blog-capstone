@@ -2,6 +2,16 @@
 
 A full-stack blog application built with Node.js, Express.js, EJS, PostgreSQL, JavaScript, HTML5, and CSS3.
 
+![Node.js](https://img.shields.io/badge/Node.js-22-green?logo=node.js)
+![Express.js](https://img.shields.io/badge/Express.js-5-black?logo=express)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-blue?logo=postgresql)
+![EJS](https://img.shields.io/badge/EJS-Templates-orange?logo=ejs)
+![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-yellow?logo=javascript)
+![Socket.IO](https://img.shields.io/badge/Socket.IO-Real--Time-black?logo=socket.io)
+![Cloudinary](https://img.shields.io/badge/Cloudinary-Image%20Storage-blue?logo=cloudinary)
+![Multer](https://img.shields.io/badge/Multer-File%20Uploads-purple)
+![Render](https://img.shields.io/badge/Render-Deployed-46E3B7?logo=render)
+
 The project started as a traditional CRUD blog and evolved into a complete social blogging platform with authentication, user profiles, post ownership controls, comments, likes, friendships, private messaging, image uploads, and production deployment.
 
 ## 🚀 Live Demo
